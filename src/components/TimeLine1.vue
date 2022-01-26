@@ -1,0 +1,47 @@
+<template>
+    <div v-if="model.progress < 100" class="time text-launchpad_primary font-semibold uppercase mb-1 md:text-base lg:text-xs lg:text-gray-100 lg:font-normal">
+        {{model.day}}D-{{ model.hours }}H-{{ model.minutes }}M-{{ model.seconds }}S
+    </div>
+    <div v-if="model.progress == 100" class="time text-launchpad_primary font-semibold uppercase mb-1 md:text-base lg:text-xs  lg:text-gray-100 lg:font-normal">
+        ENDED
+    </div>
+    <div class="hidden lg:block h-3 bg-gray-700 rounded-full w-full">
+      <div class="w-full rounded-md bg-gray-100 to-launchpad_primary-dark h-full from-launchpad_primary" v-bind:style="`width:${model.progress}%`"></div>
+    </div>
+</template>
+
+<script>
+
+export default {
+  name: "TimeLine1",
+  props: {
+    starttime: String,
+    endtime: String,
+  },
+  created() {
+    let start = new Date(this.starttime).getTime();
+    let end = new Date(this.endtime).getTime();
+    let now = new Date().getTime();
+    let dist = end - start;
+    if ((now - end) >= 0) {
+      this.progress = 100;
+      this.status = " - Ended";
+    } else {
+      this.day = Math.floor((end - now) / (1000 * 60 * 60 * 24));
+      this.hours = Math.floor(((end - now) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      this.minutes = Math.floor(((end - now) % (1000 * 60 * 60)) / (1000 * 60));
+      this.seconds = Math.floor(((end - now) % (1000 * 60)) / 1000);
+      this.progress = Math.floor((now - start)*100 / dist);
+    }
+    this.model = {
+      day: this.day,
+      hours: this.hours,
+      minutes: this.minutes,
+      seconds: this.seconds,
+      progress: this.progress,
+      status: this.status
+    }
+  },
+};
+</script>
+

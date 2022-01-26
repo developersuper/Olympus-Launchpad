@@ -1,0 +1,70 @@
+{
+  "name": "taitask",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@headlessui/vue": "^1.4.1",
+    "@heroicons/vue": "^1.0.4",
+    "@tailwindcss/forms": "^0.3.3",
+    "@tailwindui/vue": "^0.1.0-alpha.2",
+    "@vueform/slider": "^2.0.4",
+    "@walletconnect/web3-provider": "^1.6.5",
+    "core-js": "^3.6.5",
+    "jquery": "^3.6.0",
+    "node-sass": "^4.14.1",
+    "swiper": "6.4.6",
+    "v-wave": "^1.3.1",
+    "vue": "^3.2.6",
+    "ethers": "^5.4.7",
+    "vue-awesome-countdown": "^1.1.4",
+    "vue-css-donut-chart": "^2.0.0",
+    "vue-final-modal": "^3.4.3",
+    "vue-flatpickr-component": "^9.0.4",
+    "vue-plugin-load-script": ">=2.0.0",
+    "vue-router": "^4.0.10",
+    "vue-window-size": "^1.1.2",
+    "vue3-popper": "^1.2.1",
+    "vue3-slider": "^1.6.5",
+    "vuex": "^4.0.2",
+    "walletconnect": "^1.6.5",
+    "web3": "^1.5.2",
+    "web3modal": "^1.9.4"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "autoprefixer": "^9",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.0.0",
+    "postcss": "^7",
+    "sass-loader": "^7.2.0",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.8",
+    "webpack": "4.46.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
