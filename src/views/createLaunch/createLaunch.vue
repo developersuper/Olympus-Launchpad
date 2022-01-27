@@ -48,7 +48,6 @@ export default {
     launchForm,
     largeButton,
     Logo,
-    launchForm,
   },
   computed: {
     ...mapState(['launche_types']),

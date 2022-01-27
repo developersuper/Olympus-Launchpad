@@ -5,7 +5,7 @@
       <div class="bg-gray-800 border-b border-gray-700">
         <h3 class="gradient-text w-full py-6 text-center">CREATE {{model.name}}</h3>
       </div>
-      <div class="sm:px-8 px-4 py-8 flex flex-col items-center" v-if="!$store.getters['wallet/isWalletConnected']">
+      <div class="sm:px-8 px-4 py-8 flex flex-col items-center" v-if="!isWalletConnected">
         <Button name="Connect Wallet" class="connectBtn w-full max-w-64" @click="$store.dispatch('wallet/connectWallet')" />
       </div>
       <div class="sm:px-8 px-4 pb-8" v-else>
@@ -17,9 +17,9 @@
             placeholder="Enter token address"
             v-model="tokenAddress"
           />
-          <div v-if="!isValidAddress" class="text-center text-error-red">Invalid token address!  Please try with correct address.</div>
+          <div v-if="isValidAddress !== 'correct'" class="text-center text-error-red">{{ isValidAddress }}</div>
         </div>
-        <div class="mt-4">
+        <div class="mt-4" v-if="isValidAddress === 'correct'">
           <p class="text-sm mt-2 mb-4 font-semibold text-center ">TOKEN ICON (500px - 500px)</p>
           <div class="max-w-24 m-auto flex justify-center px-6 pt-5 pb-6 border-2 border-gray-500 border-dashed rounded-xl">
             <div class="space-y-2 text-center">
@@ -32,7 +32,7 @@
             </div>
           </div>
         </div>
-        <div class="caption my-8 space-y-6 rounded-lg p-4">
+        <div v-if="isValidAddress === 'correct'" class="caption my-8 space-y-6 rounded-lg p-4">
           <!-- Token select -->
           <Listbox as="div" v-model="selected" class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
             <div class="w-full lg:w-3/5 mt-1 block text-sm font-semibold text-gray-100">
@@ -69,7 +69,7 @@
             </div>
           </Listbox>
           <!-- Pair created -->
-          <div v-if="isValidAddress" class="flex flex-col mt-1 lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
+          <div class="flex flex-col mt-1 lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
             <label class="w-full lg:w-3/5 block text-sm font-semibold text-gray-100">
               PancakeSwap V2 pair to be created
             </label>
@@ -93,10 +93,10 @@
             <div class="w-full lg:w-3/5 mt-1 relative w-full">
               <div class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-2 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
                 <span class="flex justify-between">
-                  <span class="text-sm inline-block ml-2">{{ $store.getters['wallet/address'].slice(0, 28) }}</span>
+                  <span class="overflow-hidden mr-2 text-sm inline-block ml-2">{{ address }}</span>
                   <div class="relative flex-none h-6 w-11">
                     <i class="fa fa-paste text-base text-gray-200 hover:text-gray-100"></i>
-                    <i class="fa fa-external-link text-base ml-2 text-gray-200 hover:text-gray-100"></i>
+                    <a :href="'https://testnet.bscscan.com/address/' + address" target="_blank"><i class="fa fa-external-link text-base ml-2 text-gray-200 hover:text-gray-100"></i></a>
                   </div>
                 </span>
               </div>
@@ -162,7 +162,7 @@
             </label>
             <div class="w-full lg:w-2/5 mt-1 flex items-center relative">
               <div class="w-full bg-gray-600 border border-gray-300 rounded-2xl cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200">
-                <div class="rounded-2xl text-gray-200 text-right pt-2 pr-2 text-xs">BALANCE: 0</div>
+                <div class="rounded-2xl text-gray-200 text-right pt-2 pr-2 text-xs">BALANCE: {{ tokenBalance }}</div>
                 <input
                   v-model="availableTokens"
                   style="height: 42px;"
@@ -173,7 +173,7 @@
               <div class="absolute font-semibold text-gray-100 right-3 top-8">{{ tokenName }}</div>
             </div>
           </div>
-          <div v-if="!isValidAvailablePresale" class="text-center text-error-red error-msg">It must be smaller than balance.</div>
+          <div v-if="isValidAvailablePresale !== ''" class="text-center text-error-red error-msg">{{ isValidAvailablePresale }}</div>
           <div class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
             <div class="w-full">
               <label class="block text-sm font-semibold text-gray-100">
@@ -183,8 +183,8 @@
                 <input
                   v-model="hardCap"
                   style="height: 42px;"
-                  type="text"
-                  class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200 sm:text-sm"
+                  type="number"
+                  class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-14 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200 sm:text-sm"
                 />
                 <div class="absolute font-semibold text-gray-100 right-3">BNB</div>
               </div>
@@ -197,14 +197,14 @@
                 <input
                   v-model="softCap"
                   style="height: 42px;"
-                  type="text"
-                  class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200 sm:text-sm"
+                  type="number"
+                  class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-14 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200 sm:text-sm"
                 />
                 <div class="absolute font-semibold text-gray-100 right-3">BNB</div>
               </div>
             </div>
           </div>
-          <div v-if="!isValidCap" class="text-center text-error-red error-msg">Hardcap must be bigger than softCap, and it must be smaller than 2 times of softCap. </div>
+          <div v-if="isValidCap !== ''" class="text-center text-error-red error-msg">{{ isValidCap }}</div>
           <!-- Presale rate -->
           <div class="p-4 bg-gray-700 rounded-lg text-center">
             <div class="font-semibold">PRESALE RATE</div>
@@ -222,7 +222,7 @@
               </div>
               <button @click="saveEditRate()" class="py-1 px-4 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-2xl font-semibold transition-all duration-200"><i class="fa fa-save text-launchpad_primary"></i> Save</button>
             </div>
-            <div v-if="!isValidPresaleRate" class="text-center text-error-red error-msg">Presale rate must be bigger than 0.</div>
+            <div v-if="isValidPresaleRate !== ''" class="text-center text-error-red error-msg">{{ isValidPresaleRate }}</div>
           </div>
           <!-- Percent slider -->
           <label class="block text-lg font-semibold text-gray-100 text-center">PERCENT OF RAISED WBNB FOR LIQUIDITY</label>
@@ -261,7 +261,7 @@
               <div class="absolute font-semibold text-gray-100 right-3">BNB</div>
             </div>
           </div>
-          <div v-if="!isValidBNBPerUser" class="text-center text-error-red error-msg">BNB Min must be smaller than BNB Max.</div>
+          <div v-if="isValidBNBPerUser !== ''" class="text-center text-error-red error-msg">{{ isValidBNBPerUser }}</div>
           <!-- Dates -->
             <div class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
               <div class="w-full">
@@ -285,18 +285,18 @@
                 />
               </div>
             </div>
-            <div v-if="!isValidTime" class="text-center text-error-red error-msg">Time setting error!</div>
-          </div>
+            <div v-if="isValidTime !== ''" class="text-center text-error-red error-msg">{{ isValidTime }}</div>
+        </div>
 
         <div class="caption my-8 bg-gray-800 rounded-lg p-4">
           <launch-summary />
         </div>
 
         <div class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
-          <button @click="onApprove()" v-wave class="p-6 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg w-full font-semibold transition-all duration-200">
-            APPROVE
+          <button @click="approve()" v-wave class="p-6 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg w-full font-semibold transition-all duration-200">
+            {{ isApproved ? 'APPROVED' : 'APPROVE' }}
           </button>
-          <button @click="createLaunch($store.getters['wallet/address'])" v-wave :class="[!isApproved ? 'cursor-not-allowed opacity-70 bg-gray-400' : 'hover:bg-opacity-80', 'p-6 bg-launchpad_primary text-gray-900 rounded-lg w-full font-semibold transition-all duration-200']">
+          <button @click="createLaunch(address)" v-wave :class="[!isApproved ? 'cursor-not-allowed opacity-70 bg-gray-400' : 'hover:bg-opacity-80', 'p-6 bg-launchpad_primary text-gray-900 rounded-lg w-full font-semibold transition-all duration-200']">
             CREATE LAUNCH
           </button>
         </div>
@@ -312,7 +312,14 @@
 import Popup from "./Popup.vue";
 import Button from "@/components/Button.vue";
 import launchSummary from "./launchSummary.vue";
-import {detectAddress, getName, getBalance, getMyAccount, Approve, createPresale, addWhitelist, removeWhitelist} from "@/js/web3.js";
+import {
+  detectAddress, 
+  getName,  
+  createPresale, 
+  addWhitelist, 
+  getBalanceOfToken,
+  approve,
+} from "@/js/web3.js";
 import { ref } from "vue";
 import slider from "vue3-slider";
 import Head from "./Head.vue";
@@ -334,96 +341,6 @@ const tokens = [
 ];
 
 export default {
-  data() {
-    return {
-      min: 0,
-      max: 100,
-      step: 1,
-      orientation: "horizontal",
-      expand: false,
-      showInputs: false,
-      sticky: false,
-      repeat: false,
-      flip: false,
-      isEditRate: false,
-      showPopup: false,
-
-      isApproved: false,
-      isValidAddress: true,
-      isValidCap: true,
-      isValidPresaleRate: true,
-      isValidAvailablePresale: true,
-      isValidBNBPerUser: true,
-      isValidTime: true,
-      isValidAll: true,
-
-      config: {
-        enableTime: true,
-        enableSeconds: true,
-        altFormat: "M j, Y",
-        dateFormat: 'Y-m-d H:i:s',
-        time_24hr: true
-      },
-
-      lockEnabled: false,
-      whitelistEnabled: false,
-      presaleOwner: null,
-      tokenAddress: null,
-      tokenName: "--",
-      startDate: "2022-01-01",
-      endDate: "2022-12-12",
-      availableTokens: 0,
-      presaleRate: 0,
-      hardCap: 0,
-      softCap: 0,
-      percentageRaised: 10,
-      bnbLimit: 1,
-      bnbMax: 5,
-    };
-  },
-  watch: {
-    tokenAddress: async function(val) {
-      if (val.length == 42 && await detectAddress(val) == "0x" && await getName(val) != "") {
-        this.isValidAddress = true;
-        this.tokenName = await getName(val);
-      } else {
-        this.isValidAddress = false;
-        this.tokenName = "--";
-      }
-    },
-    availableTokens: async function(val) {
-      if (Number(val) > 0) this.isValidAvailablePresale = true;
-      else this.isValidAvailablePresale = false;
-    },
-    hardCap: async function(val) {
-      if (Number(val) > 0 && Number(val) > this.softCap && Number(val) < this.softCap * 2) this.isValidCap = true;
-      else this.isValidCap = false; 
-    },
-    softCap: async function(val) {
-      if (Number(val) > 0 && Number(val) < this.hardCap && Number(val) * 2 > this.hardCap) this.isValidCap = true;
-      else this.isValidCap = false; 
-    },
-    presaleRate: async function(val) {
-      if (Number(val) > 0 ) this.isValidPresaleRate = true;
-      else this.isValidPresaleRate = false; 
-    },
-    bnbLimit: async function(val) {
-      if (Number(val) > 0 && Number(val) < this.bnbMax) this.isValidBNBPerUser = true;
-      else this.isValidBNBPerUser = false; 
-    },
-    bnbMax: async function(val) {
-      if (Number(val) > 0 && Number(val) > this.bnbLimit) this.isValidBNBPerUser = true;
-      else this.isValidBNBPerUser = false; 
-    },
-    startDate: async function(val) {
-      if (new Date(val).getTime() < new Date(this.endDate).getTime()) this.isValidTime = true;
-      else this.isValidTime = false;
-    },
-    endDate: async function(val) {
-      if (new Date(val).getTime() > new Date(this.startDate).getTime()) this.isValidTime = true;
-      else this.isValidTime = false;
-    }
-  },
   components: {
     Button,
     Head,
@@ -442,25 +359,122 @@ export default {
     SwitchLabel,
     "vue3-slider": slider,
   },
+  setup() {
+    const selected = ref(tokens[0]);
+
+    return {
+      tokens,
+      selected,
+    };
+  },
+  created() {
+    let launches_type = this.launche_types.filter((launch) => launch.id == this.$route.params.id)[0];
+    this.model = {
+      ...launches_type,
+    },
+    this.startDate = Date.now() + 1000000;
+    this.endDate = this.startDate + 1000000000;
+  },
+  data() {
+    return {
+      min: 0,
+      max: 100,
+      step: 1,
+      orientation: "horizontal",
+      expand: false,
+      showInputs: false,
+      sticky: false,
+      repeat: false,
+      flip: false,
+      isEditRate: false,
+      showPopup: false,
+
+      isApproved: false,
+      isValidAddress: '',
+      isValidAll: true,
+
+      config: {
+        enableTime: true,
+        enableSeconds: true,
+        altFormat: "M j, Y",
+        dateFormat: 'Y-m-d H:i:s',
+        time_24hr: true
+      },
+
+      lockEnabled: false,
+      whitelistEnabled: false,
+      presaleOwner: null,
+      tokenAddress: null,
+      tokenName: "--",
+      startDate: "2022-01-01",
+      endDate: "2022-12-12",
+      tokenBalance: 0,
+      availableTokens: 0,
+      presaleRate: 1,
+      hardCap: 100,
+      softCap: 51,
+      percentageRaised: 70,
+      bnbLimit: 0.1,
+      bnbMax: 1.5,
+    };
+  },
+  watch: {
+    tokenAddress: async function(val) {
+      if (val.length == 42 && await detectAddress(val) == "0x" && await getName(val) != "") {
+        this.isValidAddress = 'correct';
+        this.tokenName = await getName(val);
+        this.tokenBalance = await getBalanceOfToken(val, this.address);
+        this.availableTokens = this.tokenBalance;
+        this.hardCap = this.availableTokens / this.presaleRate;
+        this.softCap = this.hardCap / 2 + 1;
+      } else {
+        this.isValidAddress = 'Invalid token address!  Please try with correct address.';
+        this.tokenName = "--";
+      }
+    },
+  },
   methods: {
-    async onApprove() {
-      if (this.isValidAddress && this.isValidAvailablePresale && this.isValidBNBPerUser && this.isValidCap && this.isValidPresaleRate && this.isValidTime && this.tokenAddress && Number(this.availableTokens) > 0 && Number(this.hardCap) > 0 && Number(this.softCap) > 0 && Number(this.presaleRate) > 0 && Number(this.bnbLimit) > 0 && Number(this.bnbMax) > 0) {
+    async approve() {
+      if (
+        this.isValidAddress === 'correct' && 
+        this.isValidAvailablePresale === '' && 
+        this.isValidBNBPerUser === '' && 
+        this.isValidCap === '' && 
+        this.isValidPresaleRate === '' && 
+        this.isValidTime === '' && 
+        this.tokenAddress && 
+        Number(this.availableTokens) > 0 && 
+        Number(this.hardCap) > 0 && 
+        Number(this.softCap) > 0 && 
+        Number(this.presaleRate) > 0 && 
+        Number(this.bnbLimit) > 0 && 
+        Number(this.bnbMax) > 0
+      ) {
         this.isValidAll = true;
-        await Approve(this.tokenAddress, this.availableTokens).then(this.setApprovedFlag);
+        const result = await approve(this.tokenAddress, this.availableTokens);
+        console.log('approve result', result);
+        this.isApproved = true;
       } else {
         this.isValidAll = false;
       }
     },
-    async createLaunch(e) {
-      const addresses = [];
-      const units = [];
-      const bools = [];
-      const whitelisted = [];
-      addresses.push(this.tokenAddress, e);
-      units.push(Number(this.softCap), Number(this.hardCap), Number(this.presaleRate), Number(this.bnbLimit), Number(this.bnbMax), Number(this.percentageRaised), new Date(this.startDate).getTime(), new Date(this.endDate).getTime(), Number(this.availableTokens));
-      bools.push(false, true);
-      await createPresale(addresses, units, bools, whitelisted);
-      console.log(addresses, units, bools, whitelisted);
+    async createLaunch() {
+      await createPresale(
+        this.tokenAddress,
+        this.address,
+        this.softCap,
+        this.hardCap,
+        this.presaleRate,
+        this.bnbLimit,
+        this.bnbMax,
+        this.percentageRaised,
+        this.startDate,
+        this.endDate,
+        this.availableTokens,
+        this.whitelistEnabled,
+        true,
+        []
+      );
     },
     setApprovedFlag() {
       this.isApproved = true;
@@ -483,24 +497,39 @@ export default {
     },
     closeModal() {
       this.showPopup = false;
-    }
+    },
   },
   computed: {
+    ...mapGetters('wallet', [
+      'address',
+      'isWalletConnected',
+    ]),
     ...mapState(['launche_types', 'enable_whitelisted_list']),
-  },
-  created() {
-    let launches_type = this.launche_types.filter((launch) => launch.id == this.$route.params.id)[0];
-    this.model = {
-      ...launches_type,
+    isValidCap() {
+      if(this.softCap === 0 || this.hardCap === 0) return 'Softcap and Hardcap must not be 0.';
+      if(this.softCap > this.hardCap) return 'Softcap must not exceed Hardcap.';
+      if(this.softCap * 2 <= this.hardCap) return 'Hardcap must be smaller than 2 times of softCap.';
+      return '';
+    },
+    isValidAvailablePresale() {
+      if(this.availableTOkens === 0) return '*Must not be 0.';
+      if(this.availableTokens > this.tokenBalance) return '*Must be smaller than balance.';
+      return '';
+    },
+    isValidPresaleRate() {
+      if(this.presaleRate === 0) return 'Presale rate must be bigger than 0.';
+      if(this.availableTokens / this.presaleRate < this.hardCap) return 'Current presale rate couldn\'t reach hardcap.';
+      return '';
+    },
+    isValidBNBPerUser() {
+      if(this.bnbLimit > this.bnbMax) return 'BNB Min must be smaller than BNB Max.';
+      return '';
+    },
+    isValidTime() {
+      if(this.startDate < new Date()) return 'Start time passed current time.';
+      if(this.startDate > this.endDate) return 'Start time must before end time.';
+      return '';
     }
-  },
-  setup() {
-    const selected = ref(tokens[0]);
-
-    return {
-      tokens,
-      selected,
-    };
   },
 };
 </script>

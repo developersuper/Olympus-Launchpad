@@ -1,10 +1,10 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3Modal from "web3modal";
 import Web3 from "web3";
-import {BNtoString} from "@/js/utilities.js";
+import { BNtoString } from "@/js/utilities.js";
 
 export default {
-    namespaced: true,
+    namespaced: true, 
     state: () => ({
         web3: null,
         address: null,

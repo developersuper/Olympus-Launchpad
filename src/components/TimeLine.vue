@@ -21,8 +21,8 @@ export default {
     endtime: String,
   },
   created() {
-    let start = new Date(this.starttime).getTime();
-    let end = new Date(this.endtime).getTime();
+    let start =this.starttime;
+    let end = this.endtime;
     let now = new Date().getTime();
     let dist = end - start;
     if ((now - end) >= 0) {

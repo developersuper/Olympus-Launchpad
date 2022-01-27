@@ -1,5 +1,5 @@
 const Web3 = require("web3");
-import { Contract, providers } from 'ethers';
+import { Contract, providers, utils } from 'ethers';
 
 const rpcURL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
 const web3 = new Web3(rpcURL)
@@ -7,7 +7,7 @@ const miniABI = require("./abi/common.json");
 const presaleCreateAbi = require("./abi/presaleCreate.json");
 const presaleAbi = require("./abi/presale.json"); 
 
-const presaleCreateAddress_dev = "0x7b7fD4cE8248DDf177db5495E6cC2Ab53292f6E1";
+const presaleCreateAddress_dev = "0xE1fB776A707BaCd6b5A0666643631BBcd590D409";
 const presaleCreateAddress_prod = "";
 
 export function getEthereum() {
@@ -37,6 +37,34 @@ export async function getName(address) {
 	}
 }
 
+export async function getBalanceOfToken(tokenAddr, userAddr) {
+	try {
+		const provider = getProvider();
+		const network = await getCurrentNetwork();
+		if (network.chainId === 97 || network.chainId === 56) {
+			const contract = new Contract(tokenAddr, miniABI, provider.getSigner());
+			return await contract.balanceOf(userAddr);
+		}
+	}catch(e) {
+		console.log('Error Occured at getBalanceOfToken', e);
+		return null;
+	}
+}
+
+export async function setApprove(tokenAddr, amount) {
+	try {
+		const provider = getProvider();
+		const network = await getCurrentNetwork();
+		if (network.chainId === 97 || network.chainId === 56) {
+			const contract = new Contract(tokenAddr, miniABI, provider.getSigner());
+			return await contract.approve(presaleCreateAddress_dev, amount);
+		}
+	}catch(e) {
+		console.log('Error Occured at getBalanceOfToken', e);
+		return null;
+	}
+}
+
 export const detectAddress = async (address) => {
 	return await web3.eth.getCode(address);
 }
@@ -58,13 +86,13 @@ export async function getContractAddress() {
 	}
 }
 
-export async function Approve(address, amount) {
+export async function approve(address, amount) {
 	try{
 		const provider = getProvider();
 		const network = await getCurrentNetwork();
 		if (network.chainId === 97 || network.chainId === 56) {
 			const contract = new Contract(address, miniABI, provider.getSigner());
-			await contract.approve(presaleCreateAddress_dev, amount);
+			return await contract.approve(presaleCreateAddress_dev, amount);
 		}
 	} catch(e) {
 		console.log(e);
@@ -72,16 +100,56 @@ export async function Approve(address, amount) {
 	}
 }
 
-export async function createPresale(addresses, units, bools, whitelisted) {
+export async function createPresale(
+	tokenAddr,
+	ownerAddr,
+	softCap,
+	hardCap,
+	presaleRate,
+	bnbLimit,
+	bnbMax,
+	percentageRaised,
+	startDate,
+	endDate,
+	availableTokens,
+	isWhitelisted,
+	isBnb,
+	whitelist
+) {
 	try{
 		const provider = getProvider();
 		const network = await getCurrentNetwork();
 		if (network.chainId === 97 || network.chainId === 56) {
 			const contract = new Contract(presaleCreateAddress_dev, presaleCreateAbi, provider.getSigner());
-			await contract.createPresale(addresses, units, bools, whitelisted);
+			const addrs = [
+				tokenAddr,
+				ownerAddr
+			];
+			const uints = [
+				utils.parseEther(softCap.toString()),
+				utils.parseEther(hardCap.toString()),
+				presaleRate,
+				utils.parseEther(bnbLimit.toString()),
+				utils.parseEther(bnbMax.toString()),
+				percentageRaised,
+				Math.floor(startDate / 1000),
+				Math.floor(endDate / 1000),
+				availableTokens
+			];
+			const bools = [
+				isWhitelisted,
+				isBnb
+			];
+			console.log(addrs, uints, bools, whitelist, contract);
+			await contract.createPresale(
+				addrs,
+				uints,
+				bools,
+				whitelist
+			);
 		}
 	} catch(e) {
-		console.log(e);
+		console.log('error occured at createpresale', e);
 		return "";
 	}
 }
@@ -92,11 +160,36 @@ export async function getPresales() {
 		const network = await getCurrentNetwork();
 		if (network.chainId === 97 || network.chainId === 56) {
 			const contract = new Contract(presaleCreateAddress_dev, presaleCreateAbi, provider.getSigner());
-			return await contract.getPresales();
+			const presaleList = await contract.getPresales();
+			
+			const presaleInfoList = await Promise.all(presaleList.map(async (presale) => {
+				const info = await getPresaleInfo(presale[2]);
+				return {
+				  ...presale,
+				  ...info,
+				}
+			  }));
+			
+			return presaleInfoList;
 		}
 	} catch(e) {
 		console.log(e);
 		return "";
+	}
+}
+
+export async function getPresaleInfo(presaleAddr) {
+	try {
+		const provider = getProvider();
+		const network = await getCurrentNetwork();
+		if (network.chainId === 97 || network.chainId === 56) {
+			const contract = new Contract(presaleAddr, presaleAbi, provider.getSigner());
+			const presaleList = await contract.getInfo();
+			return presaleList;
+		}
+	}catch(e) {
+		console.log("Error occured!", e);
+		return null;
 	}
 }
 

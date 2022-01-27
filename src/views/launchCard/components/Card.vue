@@ -6,7 +6,7 @@
         <div class="text-center flex flex-col justify-between h-full items-center">
           <div class="relative flex flex-row items-center space-x-4">
             <span :class="model.isLive ? 'ring-success bg-success' : 'ring-error bg-error'" class="w-3 h-3 ring-2 ring-opacity-40 rounded-full"></span>
-            <h3>{{ model.name }}</h3>
+            <h3>{{ model.tokenName }}</h3>
             <span v-if="model.isPublic" class="px-2 py-1 rounded-md bg-gray-700 text-gray-900 font-bold text-xs ml-2">PUBLIC</span>
             <span v-if="!model.isPublic" class="px-2 py-1 rounded-md bg-gray-700 text-gray-900 font-bold text-xs ml-2">PRIVATE</span>
             <img v-if="model.partnerType == 1" class="ml-2 w-12 h-12 border-launchpad_primary border-1 rounded-full" src="@/assets/icons/defiapetalk.png" />
@@ -19,12 +19,12 @@
             <div class="absolute z-10">
               <img class="w-48 h-48 sm:w-64 sm:h-64 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/olympus.svg" alt="Logo" />
             </div>
-            <vc-donut class="hidden sm:block" :size="324" background="#081A2E" label="76" foreground="#2F455C" :thickness="12" :sections="[{ value: model.progress, color: progressColor }]"></vc-donut>
+            <vc-donut class="hidden sm:block" :size="324" background="#081A2E" label="76" foreground="#2F455C" :thickness="12" :sections="[{ value: model.soldTokens*100 / model.presaleTokens, color: progressColor }]"></vc-donut>
             <vc-donut class="sm:hidden" :size="240" background="#081A2E" foreground="#2F455C" :thickness="10" :sections="[{ value: model.progress, color: progressColor }]"></vc-donut>
           </div>
           <div class="flex flex-col w-full">
-            <h4 class="font-semibold text-2xl mt-10 gradient-text">1000 BNB / 2000 BNB</h4>
-            <p class="font-semibold mt-2 text-xl text-gray-400 mb-4">{{ model.progress }}% Complete</p>
+            <h4 class="font-semibold text-2xl mt-10 gradient-text">{{ model.soldTokens / model.rate }} BNB / {{ model.presaleTokens / model.rate }} BNB</h4>
+            <p class="font-semibold mt-2 text-xl text-gray-400 mb-4">{{ model.soldTokens*100 / model.presaleTokens }}% Complete</p>
             <div class="countdown mt-4 w-44 sm:w-96 mx-auto">
               <Timer :starttime="model.startDate" :endtime="model.endDate" />
             </div>
@@ -107,17 +107,17 @@
             <div class="space-y-2 w-full">
               <div class="flex flex-row items-center justify-between">
                 <span class="caption text-gray-100"><b>Launch start</b></span>
-                <span class="caption gradient-text">12:41 10th of January 2021</span>
+                <span class="caption gradient-text">{{ String(new Date(Number(model.startTime))).substr(3, 22)}}</span>
               </div>
               <div class="flex flex-row items-center justify-between">
                 <span class="caption text-gray-100"><b>Launch end</b></span>
-                <span class="caption gradient-text">21:00 10th of January 2021</span>
+                <span class="caption gradient-text">{{ String(new Date(Number(model.endTime))).substr(3, 22)}}</span>
               </div>
               <div class="flex flex-row items-center justify-between">
                 <span class="caption text-gray-100"><b>Token address</b></span>
                 <div class="flex flex-row items-center space-x-2">
-                  <span class="caption text-gray-100"><b>0x9d9AFFAc21...</b></span>
-                  <a href="">
+                  <span class="caption text-gray-100"><b>{{ model.tokenAddr.substr(0,18) + "..." }}</b></span>
+                  <a :href="'https://testnet.bscscan.com/address/' + model.tokenAddr" target="_blank">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg
                   ></a>
@@ -126,8 +126,8 @@
               <div class="flex flex-row items-center justify-between">
                 <span class="caption text-gray-100"><b>Created by</b></span>
                 <div class="flex flex-row items-center space-x-2">
-                  <span class="caption text-gray-100"><b>0x9d9AFFAc21...</b></span>
-                  <a href="">
+                  <span class="caption text-gray-100"><b>{{ model.owner.substr(0,18) + "..." }}</b></span>
+                  <a :href="'https://testnet.bscscan.com/address/' + model.owner" target="_blank">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg
                   ></a>
@@ -195,6 +195,7 @@ export default {
       progressColor: "#EFBD28",
       percentageRaised: 1,
       showPopup: false,
+      param: this.$route.params.id,
     };
   },
   components: {
@@ -221,12 +222,14 @@ export default {
     ...mapState(['launches', 'partner_types', 'enable_whitelisted_list']),
   },
   created() {
-    let launches_data = this.launches.filter((launch) => launch.id == this.$route.params.id)[0];
-    
-    this.model = {
-      ...launches_data,
+    if (this.launches[0]) {
+      let launches_data = this.launches[0].filter((launch) => launch.tokenAddr == this.param)[0];
+      this.model = {
+        ...launches_data,
+      }
+    } else {
+      return null;
     }
-
   }
 };
 </script>
