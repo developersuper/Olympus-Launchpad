@@ -19,11 +19,12 @@
               <div class="relative p-6 rounded-2xl border border-launchpad_primary">
                 <div class="mt-1 flex flex-col items-center relative">
                   <input
-                    class="bg-launchpad_primary overline bg-opacity-10 hover:shadow-launchpad_primary focus:shadow-launchpad_primary relative my-8 border-launchpad_primary transition-all duration-200 placeholder-launchpad_primary text-launchpad_primary rounded-full border p-3 w-full text-center"
+                    class="bg-launchpad_primary overline bg-opacity-10 hover:shadow-launchpad_primary focus:shadow-launchpad_primary relative mt-8 border-launchpad_primary transition-all duration-200 placeholder-launchpad_primary text-launchpad_primary rounded-full border p-3 w-full text-center"
                     placeholder="Enter token address"
                     v-model="tokenAddress"
                   />
-                  <div class="flex w-1/2 mb-8 justify-around">
+                  <div v-if="!isValidAddress" class="text-center text-error-red mt-2">Invalid token address! Please try again.</div>
+                  <div class="flex w-1/2 mt-4 mb-8 justify-around">
                     <button @click="passTokenAddr()" class="py-2 px-5 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg font-semibold transition-all duration-200"><i class="fa fa-plus text-launchpad_primary"></i> Add</button>
                   </div>
                 </div>
@@ -39,11 +40,13 @@
 <script>
 import { ref } from "vue";
 import { TransitionRoot, TransitionChild, Dialog, DialogOverlay } from "@headlessui/vue";
+import {detectAddress} from "@/js/web3.js";
 
 export default {
   data() {
     return {
       tokenAddress: "",
+      isValidAddress: true,
     };
   },
   setup() {
@@ -57,6 +60,15 @@ export default {
         isOpen.value = true;
       },
     };
+  },
+  watch: {
+    tokenAddress: async function(val) {
+      if (val.length == 42 && await detectAddress(val) == "0x") {
+        this.isValidAddress = true;
+      } else {
+        this.isValidAddress = false;
+      }
+    }
   },
   methods: {
     passTokenAddr() {

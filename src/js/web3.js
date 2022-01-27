@@ -5,7 +5,7 @@ const rpcURL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
 const web3 = new Web3(rpcURL)
 const miniABI = require("./abi/common.json");
 const presaleCreateAbi = require("./abi/presaleCreate.json");
-const IBEP20Abi = require("./abi/IBEP20.json");
+const presaleAbi = require("./abi/presale.json"); 
 
 const presaleCreateAddress_dev = "0x7b7fD4cE8248DDf177db5495E6cC2Ab53292f6E1";
 const presaleCreateAddress_prod = "";
@@ -79,6 +79,62 @@ export async function createPresale(addresses, units, bools, whitelisted) {
 		if (network.chainId === 97 || network.chainId === 56) {
 			const contract = new Contract(presaleCreateAddress_dev, presaleCreateAbi, provider.getSigner());
 			await contract.createPresale(addresses, units, bools, whitelisted);
+		}
+	} catch(e) {
+		console.log(e);
+		return "";
+	}
+}
+
+export async function getPresales() {
+	try{
+		const provider = getProvider();
+		const network = await getCurrentNetwork();
+		if (network.chainId === 97 || network.chainId === 56) {
+			const contract = new Contract(presaleCreateAddress_dev, presaleCreateAbi, provider.getSigner());
+			return await contract.getPresales();
+		}
+	} catch(e) {
+		console.log(e);
+		return "";
+	}
+}
+
+export async function addWhitelist(addresses) {
+	try{
+		const provider = getProvider();
+		const network = await getCurrentNetwork();
+		if (network.chainId === 97 || network.chainId === 56) {
+			const contract = new Contract(presaleCreateAddress_dev, presaleAbi, provider.getSigner());
+			return await contract.addWhitelist(addresses);
+		}
+	} catch(e) {
+		console.log(e);
+		return "";
+	}
+}
+
+export async function removeWhitelist(addresses) {
+	try{
+		const provider = getProvider();
+		const network = await getCurrentNetwork();
+		if (network.chainId === 97 || network.chainId === 56) {
+			const contract = new Contract(presaleCreateAddress_dev, presaleAbi, provider.getSigner());
+			return await contract.removeWhitelist(addresses);
+		}
+	} catch(e) {
+		console.log(e);
+		return "";
+	}
+}
+
+export async function getWhitelist(addresses) {
+	try{
+		const provider = getProvider();
+		const network = await getCurrentNetwork();
+		if (network.chainId === 97 || network.chainId === 56) {
+			const contract = new Contract(presaleCreateAddress_dev, presaleAbi, provider.getSigner());
+			return await contract.getWhitelist(addresses);
 		}
 	} catch(e) {
 		console.log(e);

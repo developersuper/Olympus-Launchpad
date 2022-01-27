@@ -173,6 +173,7 @@
               <div class="absolute font-semibold text-gray-100 right-3 top-8">{{ tokenName }}</div>
             </div>
           </div>
+          <div v-if="!isValidAvailablePresale" class="text-center text-error-red error-msg">It must be smaller than balance.</div>
           <div class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
             <div class="w-full">
               <label class="block text-sm font-semibold text-gray-100">
@@ -203,6 +204,7 @@
               </div>
             </div>
           </div>
+          <div v-if="!isValidCap" class="text-center text-error-red error-msg">Hardcap must be bigger than softCap, and it must be smaller than 2 times of softCap. </div>
           <!-- Presale rate -->
           <div class="p-4 bg-gray-700 rounded-lg text-center">
             <div class="font-semibold">PRESALE RATE</div>
@@ -220,6 +222,7 @@
               </div>
               <button @click="saveEditRate()" class="py-1 px-4 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-2xl font-semibold transition-all duration-200"><i class="fa fa-save text-launchpad_primary"></i> Save</button>
             </div>
+            <div v-if="!isValidPresaleRate" class="text-center text-error-red error-msg">Presale rate must be bigger than 0.</div>
           </div>
           <!-- Percent slider -->
           <label class="block text-lg font-semibold text-gray-100 text-center">PERCENT OF RAISED WBNB FOR LIQUIDITY</label>
@@ -258,6 +261,7 @@
               <div class="absolute font-semibold text-gray-100 right-3">BNB</div>
             </div>
           </div>
+          <div v-if="!isValidBNBPerUser" class="text-center text-error-red error-msg">BNB Min must be smaller than BNB Max.</div>
           <!-- Dates -->
             <div class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
               <div class="w-full">
@@ -281,6 +285,7 @@
                 />
               </div>
             </div>
+            <div v-if="!isValidTime" class="text-center text-error-red error-msg">Time setting error!</div>
           </div>
 
         <div class="caption my-8 bg-gray-800 rounded-lg p-4">
@@ -295,6 +300,7 @@
             CREATE LAUNCH
           </button>
         </div>
+        <div v-if="!isValidAll" class="text-center text-error-red error-msg">Some fields are missing now.</div>
       </div>
     </div>
   </section>
@@ -306,7 +312,7 @@
 import Popup from "./Popup.vue";
 import Button from "@/components/Button.vue";
 import launchSummary from "./launchSummary.vue";
-import {detectAddress, getName, getBalance, getMyAccount, Approve, createPresale} from "@/js/web3.js";
+import {detectAddress, getName, getBalance, getMyAccount, Approve, createPresale, addWhitelist, removeWhitelist} from "@/js/web3.js";
 import { ref } from "vue";
 import slider from "vue3-slider";
 import Head from "./Head.vue";
@@ -330,27 +336,27 @@ const tokens = [
 export default {
   data() {
     return {
-      // Slider
-      expand: false,
-      showInputs: false,
       min: 0,
       max: 100,
       step: 1,
       orientation: "horizontal",
+      expand: false,
+      showInputs: false,
       sticky: false,
       repeat: false,
       flip: false,
-      isApproved: false,
-
-      tokenAddress: null,
-      isValidAddress: true,
-      tokenName: "--",
-      presaleRate: 0,
       isEditRate: false,
       showPopup: false,
 
-      startDate: "2022-12-12",
-      endDate: "2022-12-12",
+      isApproved: false,
+      isValidAddress: true,
+      isValidCap: true,
+      isValidPresaleRate: true,
+      isValidAvailablePresale: true,
+      isValidBNBPerUser: true,
+      isValidTime: true,
+      isValidAll: true,
+
       config: {
         enableTime: true,
         enableSeconds: true,
@@ -362,7 +368,12 @@ export default {
       lockEnabled: false,
       whitelistEnabled: false,
       presaleOwner: null,
+      tokenAddress: null,
+      tokenName: "--",
+      startDate: "2022-01-01",
+      endDate: "2022-12-12",
       availableTokens: 0,
+      presaleRate: 0,
       hardCap: 0,
       softCap: 0,
       percentageRaised: 10,
@@ -379,6 +390,38 @@ export default {
         this.isValidAddress = false;
         this.tokenName = "--";
       }
+    },
+    availableTokens: async function(val) {
+      if (Number(val) > 0) this.isValidAvailablePresale = true;
+      else this.isValidAvailablePresale = false;
+    },
+    hardCap: async function(val) {
+      if (Number(val) > 0 && Number(val) > this.softCap && Number(val) < this.softCap * 2) this.isValidCap = true;
+      else this.isValidCap = false; 
+    },
+    softCap: async function(val) {
+      if (Number(val) > 0 && Number(val) < this.hardCap && Number(val) * 2 > this.hardCap) this.isValidCap = true;
+      else this.isValidCap = false; 
+    },
+    presaleRate: async function(val) {
+      if (Number(val) > 0 ) this.isValidPresaleRate = true;
+      else this.isValidPresaleRate = false; 
+    },
+    bnbLimit: async function(val) {
+      if (Number(val) > 0 && Number(val) < this.bnbMax) this.isValidBNBPerUser = true;
+      else this.isValidBNBPerUser = false; 
+    },
+    bnbMax: async function(val) {
+      if (Number(val) > 0 && Number(val) > this.bnbLimit) this.isValidBNBPerUser = true;
+      else this.isValidBNBPerUser = false; 
+    },
+    startDate: async function(val) {
+      if (new Date(val).getTime() < new Date(this.endDate).getTime()) this.isValidTime = true;
+      else this.isValidTime = false;
+    },
+    endDate: async function(val) {
+      if (new Date(val).getTime() > new Date(this.startDate).getTime()) this.isValidTime = true;
+      else this.isValidTime = false;
     }
   },
   components: {
@@ -401,8 +444,11 @@ export default {
   },
   methods: {
     async onApprove() {
-      if (this.availableTokens > 0) {
+      if (this.isValidAddress && this.isValidAvailablePresale && this.isValidBNBPerUser && this.isValidCap && this.isValidPresaleRate && this.isValidTime && this.tokenAddress && Number(this.availableTokens) > 0 && Number(this.hardCap) > 0 && Number(this.softCap) > 0 && Number(this.presaleRate) > 0 && Number(this.bnbLimit) > 0 && Number(this.bnbMax) > 0) {
+        this.isValidAll = true;
         await Approve(this.tokenAddress, this.availableTokens).then(this.setApprovedFlag);
+      } else {
+        this.isValidAll = false;
       }
     },
     async createLaunch(e) {
@@ -410,25 +456,18 @@ export default {
       const units = [];
       const bools = [];
       const whitelisted = [];
-      if (this.tokenAddress != "" && e != "")
-        addresses.push(this.tokenAddress, e);
-      if (Number(this.softCap)*2 > Number(this.hardCap) && Number(this.softCap) < Number(this.hardCap))
-      units.push(Number(this.softCap), Number(this.hardCap));
-      if (this.presaleRate > 0)
-        units.push(Number(this.presaleRate));
-      const sTime = new Date(this.startDate).getTime();
-      const eTime = new Date(this.endDate).getTime();
-      units.push(Number(this.bnbLimit), Number(this.bnbMax), this.percentageRaised, sTime, eTime, Number(this.availableTokens));
-      bools.push(this.whitelistEnabled, true);
-      
+      addresses.push(this.tokenAddress, e);
+      units.push(Number(this.softCap), Number(this.hardCap), Number(this.presaleRate), Number(this.bnbLimit), Number(this.bnbMax), Number(this.percentageRaised), new Date(this.startDate).getTime(), new Date(this.endDate).getTime(), Number(this.availableTokens));
+      bools.push(false, true);
       await createPresale(addresses, units, bools, whitelisted);
-      console.log(addresses, units, bools);
+      console.log(addresses, units, bools, whitelisted);
     },
     setApprovedFlag() {
       this.isApproved = true;
     },
-    setTokenAddress(e) {
-      console.log(e, this.startDate.getTime(), this.endDate.getTime());
+    async setTokenAddress(e) {
+      await addWhitelist(e).then(this.showPopup);
+      console.log(e);
     },
     setEditRate() {
       this.isEditRate = true;
@@ -440,8 +479,11 @@ export default {
       this.showPopup = true;
     },
     showModal() {
-        this.openPopup();
+      this.openPopup();
     },
+    closeModal() {
+      this.showPopup = false;
+    }
   },
   computed: {
     ...mapState(['launche_types', 'enable_whitelisted_list']),
@@ -464,6 +506,9 @@ export default {
 </script>
 
 <style scoped>
+.error-msg {
+  margin-top: 0.5rem !important;
+}
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
