@@ -8,14 +8,14 @@
       <toggles />
     </div>
 
-    <LaunchSlide />
+    <LaunchSlide v-if="launches.length > 0" />
 
-    <div class="container mx-auto px-4 text-center flex place-self-center flex-col w-full wow fadeInDown mt-20 mb-10" data-wow-duration="0.3s" data-wow-delay="0s">
+    <div v-if="partners.length > 0" class="container mx-auto px-4 text-center flex place-self-center flex-col w-full wow fadeInDown mt-20 mb-10" data-wow-duration="0.3s" data-wow-delay="0s">
       <h2 class="pb-2">CALL CHANNEL ENDORSED</h2>
       <p class="mt-3 text-white text-base sm:text-xl lg:text-2xl">THESE PROJECTS HAVE BEEN VERIFIED BY OUR TRUSTED CALL CHANNEL PARTNERS</p>
     </div>
 
-    <PartnerSlide />
+    <PartnerSlide v-if="partners.length > 0" />
 
     <div class="container mx-auto px-4 flex flex-col lg:space-y-0 space-y-4 lg:flex-row justify-between items-center">
       <div class="flex items-center place-content-center lg:order-1 order-2 bg-opacity-90 border-gray-700 border-2 bg-gray-900 w-full rounded-2xl overflow-hidden py-10 wow fadeInLeft" data-wow-duration="0.3s" data-wow-delay="0.4s">
@@ -71,7 +71,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['launches', 'partner_types']),
+    ...mapState(['partner_types', 'partners']),
+    ...mapState('launchpad', ['launches']),
     ...mapGetters(['verifiedByParter']),
   },
   created() {

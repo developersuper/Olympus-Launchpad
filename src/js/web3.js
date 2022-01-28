@@ -235,3 +235,17 @@ export async function getWhitelist(addresses) {
 		return "";
 	}
 }
+
+export async function checkJoined(address) {
+	try{
+		const provider = getProvider();
+		const network = await getCurrentNetwork();
+		if (network.chainId === 97 || network.chainId === 56) {
+			const contract = new Contract(presaleCreateAddress_dev, presaleAbi, provider.getSigner());
+			return await contract.joined(address);
+		}
+	} catch(e) {
+		console.log(e);
+		return "";
+	}
+}

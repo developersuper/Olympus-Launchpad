@@ -92,7 +92,7 @@
               <img class="mt-12 absolute z-10 w-14 h-14 sm:w-16 sm:h-16" src="@/assets/icons/User.svg" alt="Logo" />
               <vc-donut class="hidden sm:block" :size="100" background="#081A2E" foreground="#2F455C" :thickness="17" :sections="[{ value: model.participants/10, color: progressColor }]"></vc-donut>
               <vc-donut class="sm:hidden" :size="90" background="#081A2E" foreground="#2F455C" :thickness="17" :sections="[{ value: model.participants/10, color: progressColor }]"></vc-donut>
-              <h3 class="mt-4 font-semibold">{{ model.participants }}/1000</h3>
+              <h3 class="mt-4 font-semibold">{{ model.participants }}</h3>
             </div>
             <div class="md:w-1/3 flex items-center flex-col text-center mb-2">
               <span class="text-xs font-semibold whitespace-nowrap text-center text-gray-200 mb-4">Circulating Supply</span>

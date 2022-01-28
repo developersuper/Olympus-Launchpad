@@ -20,7 +20,7 @@ export default {
         return state.launches.length !== 0 ? state.launches.filter((launche) => {
           return true;
         }) : [];
-      }
+      },
     },
     actions: {
       async loadPresales({ commit }) {

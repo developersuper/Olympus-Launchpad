@@ -224,6 +224,7 @@ export default createStore({
                 description: "First come, first serve.The ultimate fair way to launch your project with olympus",
             },
         ],
+        partners: [],
 
         initialization: null,
         web3: null,

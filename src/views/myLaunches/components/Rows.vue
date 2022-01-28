@@ -85,6 +85,9 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 import TimeLine from "@/components/TimeLine.vue";
+import {
+  checkJoined
+} from "@/js/web3.js";
 
 export default {
   components: {
