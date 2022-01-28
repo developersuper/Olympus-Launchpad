@@ -118,14 +118,15 @@ export default {
     }
   },
   computed: {
-    ...mapState(['launches', 'partner_types']),
+    ...mapState(['partner_types']),
+    ...mapState('launchpad', ['launches']),
     ...mapGetters('wallet', [
       'address'
     ]),
     launchesCreated() {
-      if (this.launches[0]) {
+      if (this.launches) {
         if (this.isCreated) {
-            return this.launches[0].filter((launche) => {
+            return this.launches.filter((launche) => {
               if (this.isActived) return launche.owner == this.address && launche.isLive == true;
               else return launche.owner == this.address && launche.isLive == false;
             })

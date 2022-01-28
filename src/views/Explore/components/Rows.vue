@@ -24,7 +24,7 @@
               </div>
             </div>
             <div class="h-154 overflow-scroll px-1 py-3 lg:py-3 lg:px-3">
-              <div v-for="launch in launches[0]" :key="launch.tokenAddr">
+              <div v-for="launch in launches" :key="launch.tokenAddr">
                 <Rowsingle :id="launch.tokenAddr" :isLive="launch.isLive" :icon="launch.icon" :isOwned="launch.isOwned" :isPublic="launch.isLive" :name="launch.tokenName" :ratio="launch.rate" :participants="launch.participants" :launchType="this.launch_type" :partnerType="launch.partnerType" :progress="launch.soldTokens*100/launch.presaleTokens" :startDate="launch.startTime" :endDate="launch.endTime" />
               </div>
             </div>
@@ -57,7 +57,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['launches']),
+    ...mapState('launchpad', ['launches']),
   },
 };
 </script>

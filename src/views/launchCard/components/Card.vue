@@ -90,9 +90,9 @@
             <div class="md:w-1/3 flex items-center flex-col text-center mb-2">
               <span class="text-xs font-semibold whitespace-nowrap text-center text-gray-200 mb-4">Participants</span>
               <img class="mt-12 absolute z-10 w-14 h-14 sm:w-16 sm:h-16" src="@/assets/icons/User.svg" alt="Logo" />
-              <vc-donut class="hidden sm:block" :size="100" background="#081A2E" foreground="#2F455C" :thickness="17" :sections="[{ value: 30, color: progressColor }]"></vc-donut>
-              <vc-donut class="sm:hidden" :size="90" background="#081A2E" foreground="#2F455C" :thickness="17" :sections="[{ value: 30, color: progressColor }]"></vc-donut>
-              <h3 class="mt-4 font-semibold">{{ participants }}/1000</h3>
+              <vc-donut class="hidden sm:block" :size="100" background="#081A2E" foreground="#2F455C" :thickness="17" :sections="[{ value: model.participants/10, color: progressColor }]"></vc-donut>
+              <vc-donut class="sm:hidden" :size="90" background="#081A2E" foreground="#2F455C" :thickness="17" :sections="[{ value: model.participants/10, color: progressColor }]"></vc-donut>
+              <h3 class="mt-4 font-semibold">{{ model.participants }}/1000</h3>
             </div>
             <div class="md:w-1/3 flex items-center flex-col text-center mb-2">
               <span class="text-xs font-semibold whitespace-nowrap text-center text-gray-200 mb-4">Circulating Supply</span>
@@ -222,15 +222,17 @@ export default {
   },
 
   computed: {
-    ...mapState(['launches', 'partner_types', 'enable_whitelisted_list']),
+    ...mapState(['partner_types', 'enable_whitelisted_list']),
+    ...mapState('launchpad', ['launches']),
   },
 
   created() {
-    if (this.launches[0]) {
-      let launches_data = this.launches[0].filter((launch) => launch.tokenAddr == this.param)[0];
+    if (this.launches) {
+      let launches_data = this.launches.filter((launch) => launch.tokenAddr == this.param)[0];
       this.model = {
         ...launches_data,
       }
+      console.log("this is url---", this.$route.params.id);
     } else {
       return null;
     }

@@ -2,6 +2,7 @@ import { createStore } from "vuex";
 
 import wallet from "@/store/wallet.js";
 import locks from "@/store/locks.js";
+import launchpad from "@/store/launchpad.js";
 import Web3 from "web3";
 import {getAllLocks, loadLPLockInfo} from "@/js/locker";
 import {RPC} from "@/js/constants";
@@ -14,6 +15,7 @@ export default createStore({
         wallet,
         locks,
         tokenLocks,
+        launchpad,
     },
     state: {
         // launches: [
@@ -179,7 +181,6 @@ export default createStore({
         //     },
 
         // ],
-        launches: [],
         partner_types: [
             {
                 id: 1,
@@ -229,9 +230,8 @@ export default createStore({
         bnbPrice: null,
     },
     mutations: {
-        async initialize(state, initialization){
+        initialize(state, initialization){
             state.initialization = initialization;
-            state.launches.push(await getPresales());
         }
     },
     actions: {
@@ -240,12 +240,10 @@ export default createStore({
             context.state.web3 = new Web3(provider);
 
             context.state.bnbPrice = await getBNBPrice(context.state.web3);
-            console.log("This is Presale array---", await getPresales());
 
             await context.dispatch("tokenLocks/loadLockList");
             await context.dispatch("locks/loadLockList");
 
-            console.log("This is my result--------", context.state.launches)
             console.log(context.getters["tokenLocks/allLocks"])
             console.log(context.getters["locks/allLocks"])
         }

@@ -127,6 +127,7 @@
             </span>
             <Switch
               v-model="whitelistEnabled"
+              v-if="!isApproved"
               :class="[
                 whitelistEnabled ? 'bg-launchpad_primary' : 'bg-gray-500',
                 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-1 focus:ring-launchpad_primary',
@@ -135,7 +136,7 @@
               <span aria-hidden="true" :class="[whitelistEnabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
             </Switch>
           </SwitchGroup>
-          <div v-if="whitelistEnabled" class="py-4 bg-gray-900 rounded-lg text-center transform ring-0 transition ease-in-out duration-600">
+          <div v-if="whitelistEnabled && !isApproved" class="py-4 bg-gray-900 rounded-lg text-center transform ring-0 transition ease-in-out duration-600">
             <div class="bg-gray-900 border border-gray-700 rounded-2xl overflow-hidden">
               <div class="bg-gray-800 shadow-lg border-b border-gray-700">
                 <div class="flex-row flex justify-between h-12 pr-9 pl-6 items-center">
