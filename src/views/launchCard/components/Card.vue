@@ -198,11 +198,13 @@ export default {
       param: this.$route.params.id,
     };
   },
+  
   components: {
     Timer,
     Popup,
     "vue3-slider": slider,
   },
+
   methods: {
     bogintific,
     setPercentageRaised(e) {
@@ -218,9 +220,11 @@ export default {
       console.log(e);
     },
   },
+
   computed: {
     ...mapState(['launches', 'partner_types', 'enable_whitelisted_list']),
   },
+
   created() {
     if (this.launches[0]) {
       let launches_data = this.launches[0].filter((launch) => launch.tokenAddr == this.param)[0];

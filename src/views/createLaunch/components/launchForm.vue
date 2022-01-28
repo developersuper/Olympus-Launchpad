@@ -144,15 +144,15 @@
                 </div>
               </div>
               <div class="max-h-80 overflow-scroll px-1 py-3 lg:py-3 lg:px-3">
-                <div class="flex justify-between p-2 rounded-md hover:bg-opacity-50 hover:bg-gray-700" v-for="whitelisted in enable_whitelisted_list" :key="whitelisted.id">
-                  <span class="hidden sm:block">{{ whitelisted.address }}</span>
-                  <span class="sm:hidden">{{ whitelisted.address.slice(0, 28) }}</span>
-                  <span class="cursor-pointer"><i class="fa fa-trash"></i></span>
+                <div class="flex justify-between p-2 rounded-md hover:bg-opacity-50 hover:bg-gray-700" v-for="whitelisted in this.whitelistedArray" :key="whitelisted">
+                  <span class="hidden sm:block">{{ whitelisted }}</span>
+                  <span class="sm:hidden">{{ whitelisted.slice(0, 28) }}</span>
+                  <span class="cursor-pointer" @click="removeWhitelisted(whitelisted)" v-if="!isApproved"><i class="fa fa-trash"></i></span>
                 </div>
               </div>
             </div>
             <div class="w-full flex justify-end mt-4">
-              <button @click="showModal()" class="py-2 px-5 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg font-semibold transition-all duration-200"><i class="fa fa-plus text-launchpad_primary"></i> Add</button>
+              <button @click="showModal()" :disabled="isApproved" class="py-2 px-5 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg font-semibold transition-all duration-200"><i class="fa fa-plus text-launchpad_primary"></i> Add</button>
             </div>
           </div>
           <!-- Tokens available -->
@@ -165,6 +165,7 @@
                 <div class="rounded-2xl text-gray-200 text-right pt-2 pr-2 text-xs">BALANCE: {{ tokenBalance }}</div>
                 <input
                   v-model="availableTokens"
+                  :disabled="isApproved"
                   style="height: 42px;"
                   type="text"
                   class="relative w-full bg-gray-600 rounded-2xl shadow-sm pl-3 pr-10 py-2 text-left sm:text-sm"
@@ -182,6 +183,7 @@
               <div class="mt-1 flex items-center relative">
                 <input
                   v-model="hardCap"
+                  :disabled="isApproved"
                   style="height: 42px;"
                   type="number"
                   class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-14 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200 sm:text-sm"
@@ -196,6 +198,7 @@
               <div class="mt-1 flex items-center relative">
                 <input
                   v-model="softCap"
+                  :disabled="isApproved"
                   style="height: 42px;"
                   type="number"
                   class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-14 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200 sm:text-sm"
@@ -213,6 +216,7 @@
               <div class="mt-1 w-full mb-4 sm:mb-0 sm:w-3/4 flex items-center relative">
                 <input
                   v-model="presaleRate"
+                  :disabled="isApproved"
                   id="presaleRate"
                   style="height: 42px;"
                   type="text"
@@ -239,6 +243,7 @@
             <div class="w-full mt-1 flex items-center relative">
               <input
                 v-model="bnbLimit"
+                :disabled="isApproved"
                 style="height: 42px;"
                 type="text"
                 class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-200 sm:text-sm"
@@ -254,6 +259,7 @@
             <div class="w-full mt-1 flex items-center relative">
               <input
                 v-model="bnbMax"
+                :disabled="isApproved"
                 style="height: 42px;"
                 type="text"
                 class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-200 sm:text-sm"
@@ -272,6 +278,7 @@
                   name="date"
                   :config="config"
                   v-model="startDate"
+                  :disabled="isApproved"
                 />
               </div>
               <div class="w-full">
@@ -282,6 +289,7 @@
                   name="date"
                   :config="config"
                   v-model="endDate"
+                  :disabled="isApproved"
                 />
               </div>
             </div>
@@ -405,6 +413,7 @@ export default {
       whitelistEnabled: false,
       presaleOwner: null,
       tokenAddress: null,
+      whitelistedArray: [],
       tokenName: "--",
       startDate: "2022-01-01",
       endDate: "2022-12-12",
@@ -454,6 +463,8 @@ export default {
         const result = await approve(this.tokenAddress, this.availableTokens);
         console.log('approve result', result);
         this.isApproved = true;
+        if (!this.whitelistEnabled) this.whitelistedArray = [];
+        console.log("this is ereererererer---", this.whitelistedArray);
       } else {
         this.isValidAll = false;
       }
@@ -473,15 +484,20 @@ export default {
         this.availableTokens,
         this.whitelistEnabled,
         true,
-        []
+        this.whitelistedArray
       );
     },
     setApprovedFlag() {
       this.isApproved = true;
     },
     async setTokenAddress(e) {
-      await addWhitelist(e).then(this.showPopup);
-      console.log(e);
+      // await addWhitelist(e).then(this.showPopup);
+      this.whitelistedArray.push(e);
+      this.showPopup = false;
+    },
+    removeWhitelisted(e) {
+      const index = this.whitelistedArray.indexOf(e);
+      if (index > -1) this.whitelistedArray.splice(index, 1);
     },
     setEditRate() {
       this.isEditRate = true;
@@ -504,7 +520,7 @@ export default {
       'address',
       'isWalletConnected',
     ]),
-    ...mapState(['launche_types', 'enable_whitelisted_list']),
+    ...mapState(['launche_types']),
     isValidCap() {
       if(this.softCap === 0 || this.hardCap === 0) return 'Softcap and Hardcap must not be 0.';
       if(this.softCap > this.hardCap) return 'Softcap must not exceed Hardcap.';

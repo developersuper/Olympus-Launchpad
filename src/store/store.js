@@ -223,49 +223,6 @@ export default createStore({
                 description: "First come, first serve.The ultimate fair way to launch your project with olympus",
             },
         ],
-        enable_whitelisted_list: [
-            {
-                id: 1,
-                address: "0x5bDacBaE440A2F30af96147DE964CC97FE283305",
-            },
-            {
-                id: 2,
-                address: "0xa96D2F0978E317e7a97aDFf7b5A76F4600916021",
-            },
-            {
-                id: 3,
-                address: "0x95478C4F7D22D1048F46100001c2C69D2BA57380",
-            },
-            {
-                id: 4,
-                address: "0xC0E2830724C946a6748dDFE09753613cd38f6767",
-            },
-            {
-                id: 5,
-                address: "0x3293cB515Dbc8E0A8Ab83f1E5F5f3CC2F6bbc7ba",
-            },
-            {
-                id: 6,
-                address: "0xffFfBBB50c131E664Ef375421094995C59808c97",
-            },
-            {
-                id: 7,
-                address: "0x02517411F32ac2481753aD3045cA19D58e448A01",
-            },
-            {
-                id: 8,
-                address: "0xf332789fae0d1d6f058bfb040b3c060d76d06574",
-            },
-            {
-                id: 9,
-                address: "0xdFf234670038dEfB2115Cf103F86dA5fB7CfD2D2",
-            },
-            {
-                id: 10,
-                address: "0x224002428cF0BA45590e0022DF4b06653058F22F",
-            },
-
-        ],
 
         initialization: null,
         web3: null,

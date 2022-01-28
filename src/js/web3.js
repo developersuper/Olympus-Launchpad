@@ -33,7 +33,7 @@ export async function getName(address) {
 		}
 	} catch(e) {
 		console.log(e);
-		return "";
+		return null;
 	}
 }
 
@@ -140,12 +140,13 @@ export async function createPresale(
 				isWhitelisted,
 				isBnb
 			];
-			console.log(addrs, uints, bools, whitelist, contract);
+			const whitelistArr = [ ...whitelist ];
+			console.log(addrs, uints, bools, whitelistArr, contract);
 			await contract.createPresale(
 				addrs,
 				uints,
 				bools,
-				whitelist
+				whitelistArr
 			);
 		}
 	} catch(e) {

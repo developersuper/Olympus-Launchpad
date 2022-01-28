@@ -71,7 +71,7 @@
           <img v-if="typeof(launche.partnerType) == `number`" class="absolute z-30 w-4 h-4 right-9 top-14" src="@/assets/icons/sheld.png" alt="Logo" />
           <h3 class="mb-2">{{ launche.tokenName }}</h3>
           <img class="absolute z-10 mt-14 w-32 h-32 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/olympus.svg" alt="Logo" />
-          <vc-donut :size="160" background="#081A2E" foreground="#2F455C" :thickness="8" :sections="[{ value: launche.progress, color: progressColor }]"></vc-donut>
+          <vc-donut :size="160" background="#081A2E" foreground="#2F455C" :thickness="8" :sections="[{ value: launche.soldTokens*100 / launche.presaleTokens, color: progressColor }]"></vc-donut>
           <div class="countdown mt-4 text-center pr-4 pl-4 lg:w-full">
             <TimeLine :starttime="launche.startTime" :endtime="launche.endTime" />
           </div>
