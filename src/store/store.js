@@ -272,8 +272,9 @@ export default createStore({
         bnbPrice: null,
     },
     mutations: {
-        initialize(state, initialization){
+        async initialize(state, initialization){
             state.initialization = initialization;
+            state.launches.push(await getPresales());
         }
     },
     actions: {
@@ -282,7 +283,7 @@ export default createStore({
             context.state.web3 = new Web3(provider);
 
             context.state.bnbPrice = await getBNBPrice(context.state.web3);
-            context.state.launches.push(await getPresales());
+            console.log("This is Presale array---", await getPresales());
 
             await context.dispatch("tokenLocks/loadLockList");
             await context.dispatch("locks/loadLockList");
@@ -293,13 +294,6 @@ export default createStore({
         }
     },
     getters: {
-        myLaunches: (state) => {
-            if (state.launches) {
-                return state.launches.filter((launche) => {
-                return launche.isOwned == true;
-                })
-            }
-        },
         verifiedByParter: (state) => {
             if (state.launches) {
                 return state.launches.filter((launche) => {

@@ -24,8 +24,8 @@
               </div>
             </div>
             <div class="h-154 overflow-scroll px-1 py-3 lg:py-3 lg:px-3">
-              <div v-for="launch in launches" :key="launch.id">
-                <Rowsingle :id="launch.id" :isLive="launch.isLive" :icon="launch.icon" :isOwned="launch.isOwned" :isPublic="launch.isPublic" :name="launch.name" :ratio="launch.ratio" :participants="launch.participants" :launchType="launch.launchType" :partnerType="launch.partnerType" :progress="launch.progress" :startDate="launch.startDate" :endDate="launch.endDate" />
+              <div v-for="launch in launches[0]" :key="launch.tokenAddr">
+                <Rowsingle :id="launch.tokenAddr" :isLive="launch.isLive" :icon="launch.icon" :isOwned="launch.isOwned" :isPublic="launch.isLive" :name="launch.tokenName" :ratio="launch.rate" :participants="launch.participants" :launchType="this.launch_type" :partnerType="launch.partnerType" :progress="launch.soldTokens*100/launch.presaleTokens" :startDate="launch.startTime" :endDate="launch.endTime" />
               </div>
             </div>
           </div>
@@ -50,6 +50,11 @@ export default {
     Button,
     Logo,
     Popper,
+  },
+  data() {
+    return {
+      launch_type: "Presale"
+    }
   },
   computed: {
     ...mapState(['launches']),
