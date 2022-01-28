@@ -26,7 +26,7 @@
             <h4 class="font-semibold text-2xl mt-10 gradient-text">{{ model.soldTokens / model.rate }} BNB / {{ model.presaleTokens / model.rate }} BNB</h4>
             <p class="font-semibold mt-2 text-xl text-gray-400 mb-4">{{ model.soldTokens*100 / model.presaleTokens }}% Complete</p>
             <div class="countdown mt-4 w-44 sm:w-96 mx-auto">
-              <Timer :starttime="model.startDate" :endtime="model.endDate" />
+              <TimeLine :starttime="model.startTime" :endtime="model.endTime" />
             </div>
             <div clas="flex flex-col sm:flex-row space-x-4 mb-5 mt-5">
               <div class="flex flex-row space-x-4 mb-5 mt-5 justify-center">
@@ -182,6 +182,7 @@ import slider from "vue3-slider";
 import Popup from "./Popup.vue";
 import { bogintific } from "@/js/helpers/filters";
 import Timer from "@/components/TimeLine.vue";
+import TimeLine from "@/components/TimeLine.vue";
 import { mapGetters, mapState } from 'vuex';
 
 export default {
@@ -201,6 +202,7 @@ export default {
   
   components: {
     Timer,
+    TimeLine,
     Popup,
     "vue3-slider": slider,
   },
