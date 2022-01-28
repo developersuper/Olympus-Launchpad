@@ -213,16 +213,16 @@ export default createStore({
                 name: "PRE-LAUNCH",
                 description: "The normal pre-launch. Set a date and pre-sale limit to promote and launch your project.",
             },
-            {
-                id: 2,
-                name: "LOTTERY-LAUNCH",
-                description: "Run a lottery competition to allow maximum exposure but limited entries for your audience",
-            },
-            {
-                id: 3,
-                name: "FAIR-LAUNCH",
-                description: "First come, first serve.The ultimate fair way to launch your project with olympus",
-            },
+            // {
+            //     id: 2,
+            //     name: "LOTTERY-LAUNCH",
+            //     description: "Run a lottery competition to allow maximum exposure but limited entries for your audience",
+            // },
+            // {
+            //     id: 3,
+            //     name: "FAIR-LAUNCH",
+            //     description: "First come, first serve.The ultimate fair way to launch your project with olympus",
+            // },
         ],
         partners: [],
 
