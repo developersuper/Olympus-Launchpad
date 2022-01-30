@@ -10,7 +10,7 @@
     <launch-form v-if="launchMode != 0" />
 
     <section v-if="launchMode === 0" class="container wow fadeInDown relative mt-10" data-wow-duration="0.3s" data-wow-delay="0.8s">
-      <div class="relative w-full flex space-x-0 lg:space-y-0 space-y-4 lg:space-x-4 flex-col lg:flex-row mb-10">
+      <div class="relative w-full flex justify-around space-x-0 lg:space-y-0 space-y-4 lg:space-x-4 flex-col lg:flex-row mb-10">
         <div v-for="launche in launche_types" :key="launche.id" :class="[launche.id == 1 ? 'hover:bg-gray-800' : '' ,'relative lg:w-1/3 bg-gray-900 cursor-pointer transition-colors duration-200 p-6 shadow-smooth border-gray-600 border rounded-2xl flex flex-col items-center']">
           <div v-if="launche.id !== 1" class="absolute w-full h-full bg-gray-900 rounded-2xl top-0 opacity-80 cursor-not-allowed"></div>
           <img v-if="launche.id == 1" class="mb-4 p-4 bg-opacity-20 bg-gray1000 w-32 h-32 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/prelaunch.png" alt="Logo" />
