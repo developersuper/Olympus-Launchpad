@@ -42,7 +42,7 @@
                 <span class="mt-2 group-hover:text-locker_primary transition-colors duration-300">Locker of Ananke</span>
               </a>
               <a @click="close" class="flex flex-col group items-center" href="https://app.olympustoken.io/">
-                <img class="h-14 w-14 group-hover:shadow-launchpad_primary rounded-full transition-all duration-300" src="@/assets/dashboard.png" />
+                <img class="h-14 w-14 group-hover:shadow-launchpad_primary rounded-full transition-all duration-300" src="@/assets/forge.png" />
                 <span class="mt-2 group-hover:text-launchpad_primary transition-colors duration-300">Forge of Hephaestus</span>
               </a>
               <a @click="close" class="flex flex-col group items-center" href="https://app.olympustoken.io/">

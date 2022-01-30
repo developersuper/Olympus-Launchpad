@@ -93,7 +93,7 @@
             <div class="w-full lg:w-3/5 mt-1 relative w-full">
               <div class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-2 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
                 <span class="flex justify-between">
-                  <span class="overflow-hidden mr-2 text-sm inline-block ml-2">{{ address }}</span>
+                  <span class="overflow-hidden mr-2 text-sm inline-block ml-2">{{ address.slice(0, 6) + '***************' + address.slice(address.length - 4, address.length) }}</span>
                   <div class="relative flex-none h-6 w-11">
                     <i class="fa fa-paste text-base text-gray-200 hover:text-gray-100"></i>
                     <a :href="'https://testnet.bscscan.com/address/' + address" target="_blank"><i class="fa fa-external-link text-base ml-2 text-gray-200 hover:text-gray-100"></i></a>
@@ -168,7 +168,7 @@
                   v-model="availableTokens"
                   :disabled="isApproved"
                   style="height: 42px;"
-                  type="text"
+                  type="number"
                   class="relative w-full bg-gray-600 rounded-2xl shadow-sm pl-3 pr-10 py-2 text-left sm:text-sm"
                 />
               </div>
@@ -235,7 +235,20 @@
             <span class="text-lg font-semibold text-launchpad_primary">0%</span>
             <span class="text-lg font-semibold text-launchpad_primary">{{ percentageRaised }}%</span>
           </div>
-          <vue3-slider class="slider custom-slider" ref="portfolioSlider" v-model="percentageRaised" :data="sliderRange" :height="12" trackColor="#081A2E" color="#EFBD28" :min="min" :max="max" :step="1" :orientation="orientation" />
+          <vue3-slider 
+            class="slider custom-slider" 
+            ref="portfolioSlider" 
+            v-model="percentageRaised" 
+            :data="sliderRange" 
+            :height="12" 
+            trackColor="#081A2E" 
+            color="#EFBD28" 
+            :min="0" 
+            :max="100" 
+            :step="1" 
+            :orientation="orientation" 
+          />
+          <div v-if="isValidLiquidityPercentage !== ''" class="text-center text-error-red error-msg">{{ isValidLiquidityPercentage }}</div>
           <!-- BNB limit -->
           <div class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
             <label class="w-full block text-sm font-semibold text-gray-100">
@@ -309,7 +322,7 @@
             CREATE LAUNCH
           </button>
         </div>
-        <div v-if="!isValidAll" class="text-center text-error-red error-msg">Some fields are missing now.</div>
+        <div v-if="!isValidAll" class="text-center text-error-red error-msg">Something went wrong.</div>
       </div>
     </div>
   </section>
@@ -332,9 +345,10 @@ import {
 import { ref } from "vue";
 import slider from "vue3-slider";
 import Head from "./Head.vue";
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters, mapState, mapActions } from 'vuex';
 import { Switch, SwitchDescription, SwitchGroup, SwitchLabel, Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from "@headlessui/vue";
 import { CheckIcon, SelectorIcon } from "@heroicons/vue/solid";
+import { BigNumber } from 'ethers';
 
 const tokens = [
   {
@@ -386,8 +400,6 @@ export default {
   },
   data() {
     return {
-      min: 0,
-      max: 100,
       step: 1,
       orientation: "horizontal",
       expand: false,
@@ -423,7 +435,7 @@ export default {
       presaleRate: 1,
       hardCap: 100,
       softCap: 51,
-      percentageRaised: 70,
+      percentageRaised: 40,
       bnbLimit: 0.1,
       bnbMax: 1.5,
     };
@@ -442,6 +454,9 @@ export default {
         this.tokenName = "--";
       }
     },
+    percentageRaised: function (val, oldVal) {
+      if(this.isApproved === true) val = oldVal;
+    }
   },
   methods: {
     async approve() {
@@ -452,26 +467,26 @@ export default {
         this.isValidCap === '' && 
         this.isValidPresaleRate === '' && 
         this.isValidTime === '' && 
+        this.isValidLiquidityPercentage === '' &&
         this.tokenAddress && 
-        Number(this.availableTokens) > 0 && 
-        Number(this.hardCap) > 0 && 
-        Number(this.softCap) > 0 && 
         Number(this.presaleRate) > 0 && 
         Number(this.bnbLimit) > 0 && 
         Number(this.bnbMax) > 0
       ) {
-        this.isValidAll = true;
         const result = await approve(this.tokenAddress, this.availableTokens);
-        console.log('approve result', result);
+        if(!result) {
+          this.isValidAll = false;
+          return;
+        }
+        this.isValidAll = true;
         this.isApproved = true;
         if (!this.whitelistEnabled) this.whitelistedArray = [];
-        console.log("this is ereererererer---", this.whitelistedArray);
       } else {
         this.isValidAll = false;
       }
     },
     async createLaunch() {
-      await createPresale(
+      const result = await createPresale(
         this.tokenAddress,
         this.address,
         this.softCap,
@@ -487,6 +502,13 @@ export default {
         true,
         this.whitelistedArray
       );
+      if(result === true) {
+        await this.loadPresales();
+        this.$router.push('/explore');
+      }else {
+        this.isValidAll = false;
+        this.isApproved = false;
+      }
     },
     setApprovedFlag() {
       this.isApproved = true;
@@ -522,6 +544,9 @@ export default {
       'isWalletConnected',
     ]),
     ...mapState(['launche_types']),
+    ...mapActions('launchpad',[
+      'loadPresales'
+    ]),
     isValidCap() {
       if(this.softCap === 0 || this.hardCap === 0) return 'Softcap and Hardcap must not be 0.';
       if(this.softCap > this.hardCap) return 'Softcap must not exceed Hardcap.';
@@ -529,12 +554,12 @@ export default {
       return '';
     },
     isValidAvailablePresale() {
-      if(this.availableTOkens === 0) return '*Must not be 0.';
-      if(this.availableTokens > this.tokenBalance) return '*Must be smaller than balance.';
+      if(this.availableTokens <= 0) return 'Must be over 0.';
+      if(BigNumber.from(this.availableTokens).gt(this.tokenBalance)) return 'Must be smaller than balance.';
       return '';
     },
     isValidPresaleRate() {
-      if(this.presaleRate === 0) return 'Presale rate must be bigger than 0.';
+      if(this.presaleRate <= 0) return 'Presale rate must be bigger than 0.';
       if(this.availableTokens / this.presaleRate < this.hardCap) return 'Current presale rate couldn\'t reach hardcap.';
       return '';
     },
@@ -545,6 +570,10 @@ export default {
     isValidTime() {
       if(this.startDate < new Date()) return 'Start time passed current time.';
       if(this.startDate > this.endDate) return 'Start time must before end time.';
+      return '';
+    },
+    isValidLiquidityPercentage() {
+      if(this.percentageRaised < 40) return 'must be over 40%';
       return '';
     }
   },
