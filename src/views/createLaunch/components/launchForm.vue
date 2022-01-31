@@ -92,13 +92,17 @@
             </label>
             <div class="w-full lg:w-3/5 mt-1 relative w-full">
               <div class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-2 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
-                <span class="flex justify-between">
-                  <span class="overflow-hidden mr-2 text-sm inline-block ml-2">{{ address.slice(0, 6) + '***************' + address.slice(address.length - 4, address.length) }}</span>
-                  <div class="relative flex-none h-6 w-11">
-                    <i class="fa fa-paste text-base text-gray-200 hover:text-gray-100"></i>
-                    <a :href="'https://testnet.bscscan.com/address/' + address" target="_blank"><i class="fa fa-external-link text-base ml-2 text-gray-200 hover:text-gray-100"></i></a>
-                  </div>
-                </span>
+                <input 
+                  v-on:focus="$event.target.select()" 
+                  ref="myinput" 
+                  readonly
+                  class="overflow-hidden mr-2 text-sm inline-block ml-2"   
+                  :value="address"/>  
+                <span class="absolute left-2 py-1 sm:py-0 bg-gray-600 mr-2 text-sm inline-block ml-2">{{ address.slice(0, 6) + '***************' + address.slice(address.length - 4, address.length) }}</span>
+                <div class="absolute right-2 top-2 h-6 w-11">
+                  <i @click="copy" class="fa fa-paste text-base text-gray-200 hover:text-gray-100"></i>
+                  <a :href="'https://testnet.bscscan.com/address/' + address" target="_blank"><i class="fa fa-external-link text-base ml-2 text-gray-200 hover:text-gray-100"></i></a>
+                </div>
               </div>
               <p class="text-xs mt-2">This account will be the only account with  the ability of creating and editing presale contract parameters.</p>
             </div>
@@ -147,13 +151,14 @@
               <div class="max-h-80 overflow-scroll px-1 py-3 lg:py-3 lg:px-3">
                 <div class="flex justify-between p-2 rounded-md hover:bg-opacity-50 hover:bg-gray-700" v-for="whitelisted in this.whitelistedArray" :key="whitelisted">
                   <span class="hidden sm:block">{{ whitelisted }}</span>
-                  <span class="sm:hidden">{{ whitelisted.slice(0, 28) }}</span>
+                  <span class="sm:hidden">{{ whitelisted.slice(0, 6) + '***************' + whitelisted.slice(whitelisted.length - 4, whitelisted.length) }}</span>
                   <span class="cursor-pointer" @click="removeWhitelisted(whitelisted)" v-if="!isApproved"><i class="fa fa-trash"></i></span>
                 </div>
               </div>
             </div>
             <div class="w-full flex justify-end mt-4">
               <button @click="showModal()" :disabled="isApproved" class="py-2 px-5 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg font-semibold transition-all duration-200"><i class="fa fa-plus text-launchpad_primary"></i> Add</button>
+              <button @click="clearWhitelisted()" :disabled="isApproved" class="py-2 ml-4 px-5 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg font-semibold transition-all duration-200"><i class="fa fa-refresh text-launchpad_primary"></i> Clear</button>
             </div>
           </div>
           <!-- Tokens available -->
@@ -510,17 +515,27 @@ export default {
         this.isApproved = false;
       }
     },
+    copy() {
+      this.$refs.myinput.focus();
+      document.execCommand('copy');
+    },
     setApprovedFlag() {
       this.isApproved = true;
     },
     async setTokenAddress(e) {
       // await addWhitelist(e).then(this.showPopup);
-      this.whitelistedArray.push(e);
+      const myArray = e.split(",");
+      for (var i = 0; i < myArray.length; i ++) 
+        this.whitelistedArray.push(myArray[i]);
       this.showPopup = false;
+      console.log("this is whitelisted array-----", this.whitelistedArray);
     },
     removeWhitelisted(e) {
       const index = this.whitelistedArray.indexOf(e);
       if (index > -1) this.whitelistedArray.splice(index, 1);
+    },
+    clearWhitelisted() {
+      this.whitelistedArray = [];
     },
     setEditRate() {
       this.isEditRate = true;
