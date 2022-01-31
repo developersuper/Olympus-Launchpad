@@ -15,8 +15,8 @@
             <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="[$route.name === 'Explore' ? activeClass : inactiveClass]" to="/explore">Explore</router-link>
             <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="[$route.name === 'Create' ? activeClass : inactiveClass]" to="/create">Create Launch</router-link>
             <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="[$route.name === 'myLaunches' ? activeClass : inactiveClass]" to="/mylaunches">My Launches</router-link>
-            <!-- <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="[$route.name === 'partners' ? activeClass : inactiveClass]" to="/partners">Partners</router-link> -->
-            <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="['opacity-30 cursor-not-allowed']" to="">Partners</router-link>
+            <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="[$route.name === 'partners' ? activeClass : inactiveClass]" to="/partners">Partners</router-link> 
+            <!-- <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="['opacity-30 cursor-not-allowed']" to="">Partners</router-link> -->
             <div class="flex flex-col lg:hidden space-y-6">
               <a class="text-white" href="https://app.olympustoken.io/">Dashboard</a>
               <a class="text-white" href="https://locker.olympustoken.io/">Locker of Ananke</a>
@@ -42,7 +42,7 @@
                 <span class="mt-2 group-hover:text-locker_primary transition-colors duration-300">Locker of Ananke</span>
               </a>
               <a @click="close" class="flex flex-col group items-center" href="https://app.olympustoken.io/">
-                <img class="h-14 w-14 group-hover:shadow-launchpad_primary rounded-full transition-all duration-300" src="@/assets/dashboard.png" />
+                <img class="h-14 w-14 group-hover:shadow-launchpad_primary rounded-full transition-all duration-300" src="@/assets/forge.png" />
                 <span class="mt-2 group-hover:text-launchpad_primary transition-colors duration-300">Forge of Hephaestus</span>
               </a>
               <a @click="close" class="flex flex-col group items-center" href="https://app.olympustoken.io/">

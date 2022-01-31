@@ -7,7 +7,7 @@ const miniABI = require("./abi/common.json");
 const presaleCreateAbi = require("./abi/presaleCreate.json");
 const presaleAbi = require("./abi/presale.json"); 
 
-const presaleCreateAddress_dev = "0xE1fB776A707BaCd6b5A0666643631BBcd590D409";
+const presaleCreateAddress_dev = "0x4fB42F555be14a4E4A01C3255450553b70c5164c";
 const presaleCreateAddress_prod = "";
 
 export function getEthereum() {
@@ -33,7 +33,7 @@ export async function getName(address) {
 		}
 	} catch(e) {
 		console.log(e);
-		return "";
+		return null;
 	}
 }
 
@@ -132,25 +132,26 @@ export async function createPresale(
 				utils.parseEther(bnbLimit.toString()),
 				utils.parseEther(bnbMax.toString()),
 				percentageRaised,
-				Math.floor(startDate / 1000),
-				Math.floor(endDate / 1000),
+				Math.ceil(startDate / 1000),
+				Math.ceil(endDate / 1000),
 				availableTokens
 			];
 			const bools = [
 				isWhitelisted,
 				isBnb
 			];
-			console.log(addrs, uints, bools, whitelist, contract);
+			const whitelistArr = [ ...whitelist ];
 			await contract.createPresale(
 				addrs,
 				uints,
 				bools,
-				whitelist
+				whitelistArr
 			);
+			return true;
 		}
 	} catch(e) {
 		console.log('error occured at createpresale', e);
-		return "";
+		return false;
 	}
 }
 
@@ -159,21 +160,21 @@ export async function getPresales() {
 		const provider = getProvider();
 		const network = await getCurrentNetwork();
 		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(presaleCreateAddress_dev, presaleCreateAbi, provider.getSigner());
-			const presaleList = await contract.getPresales();
-			
-			const presaleInfoList = await Promise.all(presaleList.map(async (presale) => {
-				const info = await getPresaleInfo(presale[2]);
+			const contract = new Contract(presaleCreateAddress_dev, presaleCreateAbi, provider.getSigner());	
+
+			const presaleInfoList = (await contract.getPresales()).map(presaleInfo => {
 				return {
-				  ...presale,
-				  ...info,
-				}
-			  }));
-			
+					...presaleInfo,
+					startTime: new Date(presaleInfo.startTime.mul(1000).toNumber()).toUTCString(),
+					endTime: new Date(presaleInfo.endTime.mul(1000).toNumber()).toUTCString()
+				};
+			});
+
+			console.log('get presales info: ', presaleInfoList);
 			return presaleInfoList;
 		}
 	} catch(e) {
-		console.log(e);
+		console.log('Error occured in getPresales', e);
 		return "";
 	}
 }
@@ -184,8 +185,8 @@ export async function getPresaleInfo(presaleAddr) {
 		const network = await getCurrentNetwork();
 		if (network.chainId === 97 || network.chainId === 56) {
 			const contract = new Contract(presaleAddr, presaleAbi, provider.getSigner());
-			const presaleList = await contract.getInfo();
-			return presaleList;
+			const presale = await contract.getInfo();
+			return presale;
 		}
 	}catch(e) {
 		console.log("Error occured!", e);
@@ -228,6 +229,20 @@ export async function getWhitelist(addresses) {
 		if (network.chainId === 97 || network.chainId === 56) {
 			const contract = new Contract(presaleCreateAddress_dev, presaleAbi, provider.getSigner());
 			return await contract.getWhitelist(addresses);
+		}
+	} catch(e) {
+		console.log(e);
+		return "";
+	}
+}
+
+export async function checkJoined(address) {
+	try{
+		const provider = getProvider();
+		const network = await getCurrentNetwork();
+		if (network.chainId === 97 || network.chainId === 56) {
+			const contract = new Contract(presaleCreateAddress_dev, presaleAbi, provider.getSigner());
+			return await contract.joined(address);
 		}
 	} catch(e) {
 		console.log(e);
