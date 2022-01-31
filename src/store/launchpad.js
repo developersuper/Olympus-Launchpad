@@ -178,9 +178,12 @@ export default {
     },
     actions: {
       async loadPresales({ commit }) {
-          const presalesArr = await getPresales();
+          const presalesArr = (await getPresales()).map((presale) => ({
+            launchType: 'PRE-SALE',
+            ...presale,
+          }));
           console.log('launches:', presalesArr);
-          commit('setLaunchpads', launches);
+          commit('setLaunchpads', presalesArr);
       }
     }
   }

@@ -7,7 +7,7 @@ const miniABI = require("./abi/common.json");
 const presaleCreateAbi = require("./abi/presaleCreate.json");
 const presaleAbi = require("./abi/presale.json"); 
 
-const presaleCreateAddress_dev = "0x4fB42F555be14a4E4A01C3255450553b70c5164c";
+const presaleCreateAddress_dev = "0x4EE6e594aD35F852f5c4BC31826D0AB2a809fF63";
 const presaleCreateAddress_prod = "";
 
 export function getEthereum() {
@@ -165,8 +165,8 @@ export async function getPresales() {
 			const presaleInfoList = (await contract.getPresales()).map(presaleInfo => {
 				return {
 					...presaleInfo,
-					startTime: new Date(presaleInfo.startTime.mul(1000).toNumber()).toUTCString(),
-					endTime: new Date(presaleInfo.endTime.mul(1000).toNumber()).toUTCString()
+					startTime: new Date(presaleInfo.startTime.mul(1000).toNumber()),
+					endTime: new Date(presaleInfo.endTime.mul(1000).toNumber())
 				};
 			});
 

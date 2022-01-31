@@ -5,14 +5,16 @@
     <img v-if="launch?.partnerType == 3" class="absolute z-20 w-6 h-6 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/gollum.png" alt="Logo" />
     <img v-if="launch?.partnerType == 4" class="absolute z-20 w-6 h-6 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/smalcalls.png" alt="Logo" />
     <h4 class="mb-4">{{ launch.tokenName }}</h4>
-    <img class="absolute z-10 mt-14 w-32 h-32 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/olympus.svg" alt="Logo" />
-    <vc-donut 
-      :size="160" 
-      background="#081A2E" 
-      foreground="#2F455C" 
-      :thickness="8" 
-      :sections="[{ value: launch.soldTokens * 100 / launch.totalTokens, color: '#EFBD28' }]" 
-    />
+    <div>
+      <img class="absolute z-10 mt-14 w-32 h-32 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/olympus.svg" alt="Logo" />
+      <vc-donut 
+        :size="160" 
+        background="#081A2E" 
+        foreground="#2F455C" 
+        :thickness="8" 
+        :sections="[{ value: launch.soldTokens * 100 / launch.totalTokens, color: '#EFBD28' }]" 
+      />
+    </div>
     <div class="countdown mt-4 text-center pr-4 pl-4 lg:w-full">
       <TimeLine :starttime="launch.startTime" :endTte="launch.endTime" />
     </div>

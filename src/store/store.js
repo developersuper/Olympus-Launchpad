@@ -64,22 +64,31 @@ export default createStore({
         initialization: null,
         web3: null,
         bnbPrice: null,
+        nowTime: null,
     },
     mutations: {
         initialize(state, initialization){
             state.initialization = initialization;
+        },
+        setNowTime(state, now) {
+            state.nowTime = now;
         }
     },
     actions: {
         async initialize(context){
             let provider = new Web3.providers.HttpProvider(RPC);
             context.state.web3 = new Web3(provider);
+            
+            setInterval(() => {
+                context.commit('setNowTime', Date.now());
+            }, 1000);
 
             context.state.bnbPrice = await getBNBPrice(context.state.web3);
 
             await context.dispatch("tokenLocks/loadLockList");
             await context.dispatch("locks/loadLockList");
-        }
+
+        },
     },
     getters: {
         verifiedByParter: (state) => {

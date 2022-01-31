@@ -3,7 +3,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "wallet_",
+        "name": "creater_",
         "type": "address"
       },
       {
@@ -25,6 +25,11 @@
         "internalType": "address[]",
         "name": "whitelist_",
         "type": "address[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "createdAt_",
+        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
@@ -57,6 +62,51 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claim",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "claimed",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -97,7 +147,7 @@
   },
   {
     "inputs": [],
-    "name": "finalise",
+    "name": "finalize",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
@@ -145,9 +195,9 @@
             "type": "bool"
           },
           {
-            "internalType": "bool",
+            "internalType": "uint8",
             "name": "isLive",
-            "type": "bool"
+            "type": "uint8"
           },
           {
             "internalType": "bool",
@@ -213,6 +263,11 @@
             "internalType": "uint256",
             "name": "participants",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "createdAt",
+            "type": "uint256"
           }
         ],
         "internalType": "struct Presale.PresaleInfo",
@@ -277,19 +332,6 @@
   },
   {
     "inputs": [],
-    "name": "isFinalised",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "isFinalized",
     "outputs": [
       {
@@ -325,9 +367,9 @@
     "name": "isLive",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "uint8",
         "name": "",
-        "type": "bool"
+        "type": "uint8"
       }
     ],
     "stateMutability": "view",
@@ -490,6 +532,13 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "refund",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address[]",
@@ -557,19 +606,6 @@
   {
     "inputs": [],
     "name": "tokenAddr",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "wallet",
     "outputs": [
       {
         "internalType": "address",

@@ -26,7 +26,7 @@
             </div>
             <div class="h-154 overflow-scroll px-1 py-3 lg:py-3 lg:px-3">
               <div v-for="launch in filteredCards" :key="launch.tokenAddr">
-                <Rowsingle :id="launch.tokenAddr" :isLive="launch.isLive" :icon="launch.icon" :isOwned="launch.isOwned" :isPublic="launch.isLive" :name="launch.tokenName" :ratio="launch.rate" :participants="launch.participants" :launchType="this.launch_type" :partnerType="launch.partnerType" :progress="launch.soldTokens*100/launch.presaleTokens" :startDate="launch.startTime" :endDate="launch.endTime" />
+                <Rowsingle :launch="launch" />
               </div>
             </div>
           </div>
@@ -37,24 +37,16 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import Rowsingle from "./Rowsingle.vue";
-import Button from "@/components/Button.vue";
-import Logo from "@/components/Logo.vue";
-import Popper from "vue3-popper";
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: "Rows",
   components: {
     Rowsingle,
-    Button,
-    Logo,
-    Popper,
   },
   data() {
     return {
-      launch_type: "Presale",
       searchValue: ""
     }
   },
