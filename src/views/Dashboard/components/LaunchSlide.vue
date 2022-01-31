@@ -6,7 +6,7 @@
     :pagination="{ clickable: true }"
     @swiper="onSwiper"
     @slideChange="onSlideChange"
-    class="sm:hidden p-9 "
+    class="sm:block p-9 md:hidden"
   >
     <swiper-slide v-for="launch in launches" :key="launch.tokenAddr">
       <Card 
@@ -21,7 +21,7 @@
     :pagination="{ clickable: true }"
     @swiper="onSwiper"
     @slideChange="onSlideChange"
-    class="hidden sm:block lg:hidden pb-10"
+    class="hidden md:block xl:hidden pb-10"
   >
     <swiper-slide v-for="launch in launches" :key="launch.tokenAddr">
       <Card 
@@ -36,7 +36,7 @@
     :pagination="{ clickable: true }"
     @swiper="onSwiper"
     @slideChange="onSlideChange"
-    class="hidden lg:block xl:hidden pb-10"
+    class="hidden xl:block 2xl:hidden pb-10"
   >
     <swiper-slide v-for="launch in launches" :key="launch.tokenAddr">
       <Card 
@@ -51,7 +51,7 @@
     :pagination="{ clickable: true }"
     @swiper="onSwiper"
     @slideChange="onSlideChange"
-    class="hidden xl:block pb-10"
+    class="hidden 2xl:block pb-10"
   >
     <swiper-slide v-for="launch in launches" :key="launch.tokenAddr">
       <Card 
@@ -101,7 +101,7 @@ export default {
     console.log('launches', this.launches);
   },
   methods: {
-    onSwiper(swiper) {
+    onSwiper() {
       // console.log(swiper)
     },
     onSlideChange() {

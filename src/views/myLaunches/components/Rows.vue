@@ -73,10 +73,11 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
-import {
-  checkJoined
-} from "@/js/web3.js";
+// import {
+//   checkJoined
+// } from "@/js/web3.js";
 import Card from '@/components/Card.vue';
+
 
 export default {
   components: {
@@ -117,8 +118,5 @@ export default {
       'address'
     ]),
   },
-  created() {
-    
-  }
 };
 </script>

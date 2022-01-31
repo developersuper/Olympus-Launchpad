@@ -20,7 +20,7 @@
                 <div class="mt-1 flex flex-col items-center relative">
                   <textarea
                     rows="12"
-                    class="bg-launchpad_primary overline bg-opacity-10 hover:shadow-launchpad_primary focus:shadow-launchpad_primary relative mt-8 border-launchpad_primary transition-all duration-200 placeholder-launchpad_primary text-launchpad_primary rounded-md border p-3 w-full text-center"
+                    class="bg-launchpad_primary overline bg-opacity-10 hover:shadow-launchpad_primary focus:shadow-launchpad_primary relative mt-8 border-launchpad_primary transition-all duration-200 placeholder-launchpad_primary text-launchpad_primary rounded-md border p-3 w-full"
                     placeholder="Enter token address"
                     v-model="tokenAddress"
                   />

@@ -1,12 +1,12 @@
 <template>
   <div class="relative w-full bg-gray-900 p-6 shadow-smooth border-gray-600 border rounded-2xl flex flex-col items-center">
-    <img v-if="launch?.partnerType == 1" class="absolute z-20 w-6 h-6 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/defiapetalk.png" alt="Logo" />
-    <img v-if="launch?.partnerType == 2" class="absolute z-20 w-6 h-6 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/madlab.png" alt="Logo" />
-    <img v-if="launch?.partnerType == 3" class="absolute z-20 w-6 h-6 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/gollum.png" alt="Logo" />
-    <img v-if="launch?.partnerType == 4" class="absolute z-20 w-6 h-6 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/smalcalls.png" alt="Logo" />
+    <img v-if="launch?.partnerType == 1" class="absolute z-20 w-10 h-10 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/defiapetalk.png" alt="Logo" />
+    <img v-if="launch?.partnerType == 2" class="absolute z-20 w-10 h-10 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/madlab.png" alt="Logo" />
+    <img v-if="launch?.partnerType == 3" class="absolute z-20 w-10 h-10 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/gollum.png" alt="Logo" />
+    <img v-if="launch?.partnerType == 4" class="absolute z-20 w-10 h-10 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/smalcalls.png" alt="Logo" />
     <h4 class="mb-4">{{ launch.tokenName }}</h4>
-    <div>
-      <img class="absolute z-10 mt-14 w-32 h-32 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/olympus.svg" alt="Logo" />
+    <div class="relative">
+      <img class="center-card z-10 w-32 h-32 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/olympus.svg" alt="Logo" />
       <vc-donut 
         :size="160" 
         background="#081A2E" 
@@ -41,3 +41,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.center-card {
+  position: absolute;
+  top: 10%;
+  right: 10%;
+}
+</style>
