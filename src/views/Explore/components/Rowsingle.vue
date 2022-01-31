@@ -1,5 +1,5 @@
 <template>
-  <router-link @click="$router.push(`/launchcard/${launch.tokenAddr}`)" to="" class="mb-5 px-10 py-6 bg-gray-800 lg:py-3 lg:px-3 lg:mb-0 flex lg:flex-row flex-col justify-between items-center lg:bg-transparent hover:bg-opacity-50 hover:bg-gray-700 rounded-lg lg:mx-0 mx-4">
+  <router-link @click="$router.push(`/launchcard/${launch.presaleAddr}`)" to="" class="mb-5 px-10 py-6 bg-gray-800 lg:py-3 lg:px-3 lg:mb-0 flex lg:flex-row flex-col justify-between items-center lg:bg-transparent hover:bg-opacity-50 hover:bg-gray-700 rounded-lg lg:mx-0 mx-4">
     <div class="tokenNameCell mb-2 lg:pb-0 pb-4 flex items-center">
       <span :class="isLive ? 'ring-success bg-success' : 'ring-error bg-error'" class="w-3 h-3 ring-2 ring-opacity-40 rounded-full"></span>
       <img v-if="icon" class="ml-2 w-6 h-6 border-launchpad_primary border-2 rounded-full" :src="icon" />

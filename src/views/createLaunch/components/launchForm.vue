@@ -343,7 +343,7 @@ import {
   detectAddress, 
   getName,  
   createPresale, 
-  addWhitelist, 
+  // addWhitelist, 
   getBalanceOfToken,
   approve,
 } from "@/js/web3.js";
@@ -351,7 +351,7 @@ import { ref } from "vue";
 import slider from "vue3-slider";
 import Head from "./Head.vue";
 import { mapGetters, mapState, mapActions } from 'vuex';
-import { Switch, SwitchDescription, SwitchGroup, SwitchLabel, Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from "@headlessui/vue";
+import { Switch, SwitchGroup, SwitchLabel, Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/vue";
 import { CheckIcon, SelectorIcon } from "@heroicons/vue/solid";
 import { BigNumber } from 'ethers';
 
@@ -376,13 +376,13 @@ export default {
     launchSummary,
     Listbox,
     ListboxButton,
-    ListboxLabel,
+    // ListboxLabel,
     ListboxOption,
     ListboxOptions,
     CheckIcon,
     SelectorIcon,
     Switch,
-    SwitchDescription,
+    // SwitchDescription,
     SwitchGroup,
     SwitchLabel,
     "vue3-slider": slider,
@@ -528,7 +528,6 @@ export default {
       for (var i = 0; i < myArray.length; i ++) 
         this.whitelistedArray.push(myArray[i]);
       this.showPopup = false;
-      console.log("this is whitelisted array-----", this.whitelistedArray);
     },
     removeWhitelisted(e) {
       const index = this.whitelistedArray.indexOf(e);

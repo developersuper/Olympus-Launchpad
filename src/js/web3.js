@@ -170,8 +170,6 @@ export async function getPresales() {
 					createdAt: new Date(presaleInfo.createdAt.mul(1000).toNumber())
 				};
 			});
-
-			console.log('get presales info: ', presaleInfoList);
 			return presaleInfoList;
 		}
 	} catch(e) {
@@ -186,8 +184,15 @@ export async function getPresaleInfo(presaleAddr) {
 		const network = await getCurrentNetwork();
 		if (network.chainId === 97 || network.chainId === 56) {
 			const contract = new Contract(presaleAddr, presaleAbi, provider.getSigner());
+			// console.log('here', presaleAddr, provider.getSigner())
 			const presale = await contract.getInfo();
-			return presale;
+
+			return {
+				...presale,
+				startTime: new Date(presale.startTime.mul(1000).toNumber()),
+				endTime: new Date(presale.endTime.mul(1000).toNumber()),
+				createdAt: new Date(presale.createdAt.mul(1000).toNumber())
+			};
 		}
 	}catch(e) {
 		console.log("Error occured!", e);

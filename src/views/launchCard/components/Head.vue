@@ -3,9 +3,9 @@
     <div class="heading wow fadeInDown " data-wow-duration="0.3s" data-wow-delay="0s">
       <div class="flex flex-col items-center">  
         <div class="flex flex-row items-center space-x-4">
-          <h2 class="pb-2">
+          <h2>
             LAUNCH: 
-          </h2><img class="w-10 h-10" src="@/assets/icons/olympus.svg" /><h2 class="pb-2">{{ model.tokenName }}</h2>
+          </h2><img class="w-10 h-10" :src=" model?.src ? model.src : defaultIcon" /><h2 class="pb-2">{{ model.tokenName }}</h2>
         </div>
       </div>
        <Logo class="max-w-75 mx-auto" />
@@ -26,12 +26,17 @@
 // @ is an alias to /src
 // import ItemComp from "@/components/Itemc.vue"
 import Logo from "@/components/Logo.vue";
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: "Head",
   components: {
     Logo,
+  },
+  data() {
+    return {
+      defaultIcon: require('@/assets/icons/unknownToken.svg'),
+    }
   },
   computed: {
     ...mapState(['partner_types']),
