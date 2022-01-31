@@ -9,6 +9,8 @@
   </div>
 </template>
 <script>
+import { mapActions } from 'vuex';
+
 import Navbar from "@/components/Navbar.vue";
 import Footer from "@/components/Footer.vue";
 import Background from "@/components/Background.vue";
@@ -20,6 +22,14 @@ export default {
     Footer,
     Background,
   },
+  methods: {
+    ...mapActions('launchpad',[
+      'loadPresales'
+    ]),
+  },
+  async mounted() {
+    await this.loadPresales();
+  }
 };
 </script>
 <style>

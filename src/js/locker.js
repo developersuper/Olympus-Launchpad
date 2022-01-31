@@ -14,7 +14,6 @@ import {BNtoString, toMinPrecisionString} from "@/js/utilities";
 export async function getAllLocks(web3, factory){
     let contract = new web3.eth.Contract(FACTORY_ABI, factory);
     let data = await contract.methods.getAllLocks().call();
-    console.log(data);
     return data;
 }
 
@@ -75,7 +74,6 @@ export async function loadTokenLockInfo(web3, bnbPrice, lock){
         info.timePercentThrough = (100 * (currentTime - lockTime) / (unlockTime - lockTime)).toFixed(2) + "%";
     }
 
-    console.log(info);
     return info;
 }
 
@@ -111,7 +109,6 @@ export async function loadLPLockInfo(web3, bnbPrice, lock){
         info.timePercentThrough = (100 * (currentTime - lockTime) / (unlockTime - lockTime)).toFixed(2) + "%";
     }
 
-    console.log(info);
     return info;
 }
 

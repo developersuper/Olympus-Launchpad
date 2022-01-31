@@ -26,7 +26,7 @@
             <h4 class="font-semibold text-2xl mt-10 gradient-text">{{ model.soldTokens / model.rate }} BNB / {{ model.presaleTokens / model.rate }} BNB</h4>
             <p class="font-semibold mt-2 text-xl text-gray-400 mb-4">{{ model.soldTokens*100 / model.presaleTokens }}% Complete</p>
             <div class="countdown mt-4 w-44 sm:w-96 mx-auto">
-              <Timer :starttime="model.startDate" :endtime="model.endDate" />
+              <TimeLine :starttime="model.startTime" :endtime="model.endTime" />
             </div>
             <div clas="flex flex-col sm:flex-row space-x-4 mb-5 mt-5">
               <div class="flex flex-row space-x-4 mb-5 mt-5 justify-center">
@@ -90,9 +90,9 @@
             <div class="md:w-1/3 flex items-center flex-col text-center mb-2">
               <span class="text-xs font-semibold whitespace-nowrap text-center text-gray-200 mb-4">Participants</span>
               <img class="mt-12 absolute z-10 w-14 h-14 sm:w-16 sm:h-16" src="@/assets/icons/User.svg" alt="Logo" />
-              <vc-donut class="hidden sm:block" :size="100" background="#081A2E" foreground="#2F455C" :thickness="17" :sections="[{ value: 30, color: progressColor }]"></vc-donut>
-              <vc-donut class="sm:hidden" :size="90" background="#081A2E" foreground="#2F455C" :thickness="17" :sections="[{ value: 30, color: progressColor }]"></vc-donut>
-              <h3 class="mt-4 font-semibold">{{ participants }}/1000</h3>
+              <vc-donut class="hidden sm:block" :size="100" background="#081A2E" foreground="#2F455C" :thickness="17" :sections="[{ value: model.participants/10, color: progressColor }]"></vc-donut>
+              <vc-donut class="sm:hidden" :size="90" background="#081A2E" foreground="#2F455C" :thickness="17" :sections="[{ value: model.participants/10, color: progressColor }]"></vc-donut>
+              <h3 class="mt-4 font-semibold">{{ model.participants }}</h3>
             </div>
             <div class="md:w-1/3 flex items-center flex-col text-center mb-2">
               <span class="text-xs font-semibold whitespace-nowrap text-center text-gray-200 mb-4">Circulating Supply</span>
@@ -182,6 +182,7 @@ import slider from "vue3-slider";
 import Popup from "./Popup.vue";
 import { bogintific } from "@/js/helpers/filters";
 import Timer from "@/components/TimeLine.vue";
+import TimeLine from "@/components/TimeLine.vue";
 import { mapGetters, mapState } from 'vuex';
 
 export default {
@@ -198,11 +199,14 @@ export default {
       param: this.$route.params.id,
     };
   },
+  
   components: {
     Timer,
+    TimeLine,
     Popup,
     "vue3-slider": slider,
   },
+
   methods: {
     bogintific,
     setPercentageRaised(e) {
@@ -218,15 +222,19 @@ export default {
       console.log(e);
     },
   },
+
   computed: {
-    ...mapState(['launches', 'partner_types', 'enable_whitelisted_list']),
+    ...mapState(['partner_types', 'enable_whitelisted_list']),
+    ...mapState('launchpad', ['launches']),
   },
+
   created() {
-    if (this.launches[0]) {
-      let launches_data = this.launches[0].filter((launch) => launch.tokenAddr == this.param)[0];
+    if (this.launches) {
+      let launches_data = this.launches.filter((launch) => launch.tokenAddr == this.param)[0];
       this.model = {
         ...launches_data,
       }
+      console.log("this is url---", this.$route.params.id);
     } else {
       return null;
     }

@@ -92,13 +92,17 @@
             </label>
             <div class="w-full lg:w-3/5 mt-1 relative w-full">
               <div class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-2 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 sm:text-sm">
-                <span class="flex justify-between">
-                  <span class="overflow-hidden mr-2 text-sm inline-block ml-2">{{ address }}</span>
-                  <div class="relative flex-none h-6 w-11">
-                    <i class="fa fa-paste text-base text-gray-200 hover:text-gray-100"></i>
-                    <a :href="'https://testnet.bscscan.com/address/' + address" target="_blank"><i class="fa fa-external-link text-base ml-2 text-gray-200 hover:text-gray-100"></i></a>
-                  </div>
-                </span>
+                <input 
+                  v-on:focus="$event.target.select()" 
+                  ref="myinput" 
+                  readonly
+                  class="overflow-hidden mr-2 text-sm inline-block ml-2"   
+                  :value="address"/>  
+                <span class="absolute left-2 py-1 sm:py-0 bg-gray-600 mr-2 text-sm inline-block ml-2">{{ address.slice(0, 6) + '***************' + address.slice(address.length - 4, address.length) }}</span>
+                <div class="absolute right-2 top-2 h-6 w-11">
+                  <i @click="copy" class="fa fa-paste text-base text-gray-200 hover:text-gray-100"></i>
+                  <a :href="'https://testnet.bscscan.com/address/' + address" target="_blank"><i class="fa fa-external-link text-base ml-2 text-gray-200 hover:text-gray-100"></i></a>
+                </div>
               </div>
               <p class="text-xs mt-2">This account will be the only account with  the ability of creating and editing presale contract parameters.</p>
             </div>
@@ -127,6 +131,7 @@
             </span>
             <Switch
               v-model="whitelistEnabled"
+              v-if="!isApproved"
               :class="[
                 whitelistEnabled ? 'bg-launchpad_primary' : 'bg-gray-500',
                 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-1 focus:ring-launchpad_primary',
@@ -135,7 +140,7 @@
               <span aria-hidden="true" :class="[whitelistEnabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
             </Switch>
           </SwitchGroup>
-          <div v-if="whitelistEnabled" class="py-4 bg-gray-900 rounded-lg text-center transform ring-0 transition ease-in-out duration-600">
+          <div v-if="whitelistEnabled && !isApproved" class="py-4 bg-gray-900 rounded-lg text-center transform ring-0 transition ease-in-out duration-600">
             <div class="bg-gray-900 border border-gray-700 rounded-2xl overflow-hidden">
               <div class="bg-gray-800 shadow-lg border-b border-gray-700">
                 <div class="flex-row flex justify-between h-12 pr-9 pl-6 items-center">
@@ -144,15 +149,16 @@
                 </div>
               </div>
               <div class="max-h-80 overflow-scroll px-1 py-3 lg:py-3 lg:px-3">
-                <div class="flex justify-between p-2 rounded-md hover:bg-opacity-50 hover:bg-gray-700" v-for="whitelisted in enable_whitelisted_list" :key="whitelisted.id">
-                  <span class="hidden sm:block">{{ whitelisted.address }}</span>
-                  <span class="sm:hidden">{{ whitelisted.address.slice(0, 28) }}</span>
-                  <span class="cursor-pointer"><i class="fa fa-trash"></i></span>
+                <div class="flex justify-between p-2 rounded-md hover:bg-opacity-50 hover:bg-gray-700" v-for="whitelisted in this.whitelistedArray" :key="whitelisted">
+                  <span class="hidden sm:block">{{ whitelisted }}</span>
+                  <span class="sm:hidden">{{ whitelisted.slice(0, 6) + '***************' + whitelisted.slice(whitelisted.length - 4, whitelisted.length) }}</span>
+                  <span class="cursor-pointer" @click="removeWhitelisted(whitelisted)" v-if="!isApproved"><i class="fa fa-trash"></i></span>
                 </div>
               </div>
             </div>
             <div class="w-full flex justify-end mt-4">
-              <button @click="showModal()" class="py-2 px-5 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg font-semibold transition-all duration-200"><i class="fa fa-plus text-launchpad_primary"></i> Add</button>
+              <button @click="showModal()" :disabled="isApproved" class="py-2 px-5 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg font-semibold transition-all duration-200"><i class="fa fa-plus text-launchpad_primary"></i> Add</button>
+              <button @click="clearWhitelisted()" :disabled="isApproved" class="py-2 ml-4 px-5 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg font-semibold transition-all duration-200"><i class="fa fa-refresh text-launchpad_primary"></i> Clear</button>
             </div>
           </div>
           <!-- Tokens available -->
@@ -165,8 +171,9 @@
                 <div class="rounded-2xl text-gray-200 text-right pt-2 pr-2 text-xs">BALANCE: {{ tokenBalance }}</div>
                 <input
                   v-model="availableTokens"
+                  :disabled="isApproved"
                   style="height: 42px;"
-                  type="text"
+                  type="number"
                   class="relative w-full bg-gray-600 rounded-2xl shadow-sm pl-3 pr-10 py-2 text-left sm:text-sm"
                 />
               </div>
@@ -182,6 +189,7 @@
               <div class="mt-1 flex items-center relative">
                 <input
                   v-model="hardCap"
+                  :disabled="isApproved"
                   style="height: 42px;"
                   type="number"
                   class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-14 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200 sm:text-sm"
@@ -196,6 +204,7 @@
               <div class="mt-1 flex items-center relative">
                 <input
                   v-model="softCap"
+                  :disabled="isApproved"
                   style="height: 42px;"
                   type="number"
                   class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-14 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200 sm:text-sm"
@@ -213,6 +222,7 @@
               <div class="mt-1 w-full mb-4 sm:mb-0 sm:w-3/4 flex items-center relative">
                 <input
                   v-model="presaleRate"
+                  :disabled="isApproved"
                   id="presaleRate"
                   style="height: 42px;"
                   type="text"
@@ -230,7 +240,20 @@
             <span class="text-lg font-semibold text-launchpad_primary">0%</span>
             <span class="text-lg font-semibold text-launchpad_primary">{{ percentageRaised }}%</span>
           </div>
-          <vue3-slider class="slider custom-slider" ref="portfolioSlider" v-model="percentageRaised" :data="sliderRange" :height="12" trackColor="#081A2E" color="#EFBD28" :min="min" :max="max" :step="1" :orientation="orientation" />
+          <vue3-slider 
+            class="slider custom-slider" 
+            ref="portfolioSlider" 
+            v-model="percentageRaised" 
+            :data="sliderRange" 
+            :height="12" 
+            trackColor="#081A2E" 
+            color="#EFBD28" 
+            :min="0" 
+            :max="100" 
+            :step="1" 
+            :orientation="orientation" 
+          />
+          <div v-if="isValidLiquidityPercentage !== ''" class="text-center text-error-red error-msg">{{ isValidLiquidityPercentage }}</div>
           <!-- BNB limit -->
           <div class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
             <label class="w-full block text-sm font-semibold text-gray-100">
@@ -239,6 +262,7 @@
             <div class="w-full mt-1 flex items-center relative">
               <input
                 v-model="bnbLimit"
+                :disabled="isApproved"
                 style="height: 42px;"
                 type="text"
                 class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-200 sm:text-sm"
@@ -254,6 +278,7 @@
             <div class="w-full mt-1 flex items-center relative">
               <input
                 v-model="bnbMax"
+                :disabled="isApproved"
                 style="height: 42px;"
                 type="text"
                 class="relative w-full bg-gray-600 border border-gray-300 rounded-2xl shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-200 sm:text-sm"
@@ -272,6 +297,7 @@
                   name="date"
                   :config="config"
                   v-model="startDate"
+                  :disabled="isApproved"
                 />
               </div>
               <div class="w-full">
@@ -282,6 +308,7 @@
                   name="date"
                   :config="config"
                   v-model="endDate"
+                  :disabled="isApproved"
                 />
               </div>
             </div>
@@ -300,7 +327,7 @@
             CREATE LAUNCH
           </button>
         </div>
-        <div v-if="!isValidAll" class="text-center text-error-red error-msg">Some fields are missing now.</div>
+        <div v-if="!isValidAll" class="text-center text-error-red error-msg">Something went wrong.</div>
       </div>
     </div>
   </section>
@@ -323,9 +350,10 @@ import {
 import { ref } from "vue";
 import slider from "vue3-slider";
 import Head from "./Head.vue";
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters, mapState, mapActions } from 'vuex';
 import { Switch, SwitchDescription, SwitchGroup, SwitchLabel, Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from "@headlessui/vue";
 import { CheckIcon, SelectorIcon } from "@heroicons/vue/solid";
+import { BigNumber } from 'ethers';
 
 const tokens = [
   {
@@ -377,8 +405,6 @@ export default {
   },
   data() {
     return {
-      min: 0,
-      max: 100,
       step: 1,
       orientation: "horizontal",
       expand: false,
@@ -405,6 +431,7 @@ export default {
       whitelistEnabled: false,
       presaleOwner: null,
       tokenAddress: null,
+      whitelistedArray: [],
       tokenName: "--",
       startDate: "2022-01-01",
       endDate: "2022-12-12",
@@ -413,7 +440,7 @@ export default {
       presaleRate: 1,
       hardCap: 100,
       softCap: 51,
-      percentageRaised: 70,
+      percentageRaised: 40,
       bnbLimit: 0.1,
       bnbMax: 1.5,
     };
@@ -432,6 +459,9 @@ export default {
         this.tokenName = "--";
       }
     },
+    percentageRaised: function (val, oldVal) {
+      if(this.isApproved === true) val = oldVal;
+    }
   },
   methods: {
     async approve() {
@@ -442,24 +472,26 @@ export default {
         this.isValidCap === '' && 
         this.isValidPresaleRate === '' && 
         this.isValidTime === '' && 
+        this.isValidLiquidityPercentage === '' &&
         this.tokenAddress && 
-        Number(this.availableTokens) > 0 && 
-        Number(this.hardCap) > 0 && 
-        Number(this.softCap) > 0 && 
         Number(this.presaleRate) > 0 && 
         Number(this.bnbLimit) > 0 && 
         Number(this.bnbMax) > 0
       ) {
-        this.isValidAll = true;
         const result = await approve(this.tokenAddress, this.availableTokens);
-        console.log('approve result', result);
+        if(!result) {
+          this.isValidAll = false;
+          return;
+        }
+        this.isValidAll = true;
         this.isApproved = true;
+        if (!this.whitelistEnabled) this.whitelistedArray = [];
       } else {
         this.isValidAll = false;
       }
     },
     async createLaunch() {
-      await createPresale(
+      const result = await createPresale(
         this.tokenAddress,
         this.address,
         this.softCap,
@@ -473,15 +505,37 @@ export default {
         this.availableTokens,
         this.whitelistEnabled,
         true,
-        []
+        this.whitelistedArray
       );
+      if(result === true) {
+        await this.loadPresales();
+        this.$router.push('/explore');
+      }else {
+        this.isValidAll = false;
+        this.isApproved = false;
+      }
+    },
+    copy() {
+      this.$refs.myinput.focus();
+      document.execCommand('copy');
     },
     setApprovedFlag() {
       this.isApproved = true;
     },
     async setTokenAddress(e) {
-      await addWhitelist(e).then(this.showPopup);
-      console.log(e);
+      // await addWhitelist(e).then(this.showPopup);
+      const myArray = e.split(",");
+      for (var i = 0; i < myArray.length; i ++) 
+        this.whitelistedArray.push(myArray[i]);
+      this.showPopup = false;
+      console.log("this is whitelisted array-----", this.whitelistedArray);
+    },
+    removeWhitelisted(e) {
+      const index = this.whitelistedArray.indexOf(e);
+      if (index > -1) this.whitelistedArray.splice(index, 1);
+    },
+    clearWhitelisted() {
+      this.whitelistedArray = [];
     },
     setEditRate() {
       this.isEditRate = true;
@@ -504,7 +558,10 @@ export default {
       'address',
       'isWalletConnected',
     ]),
-    ...mapState(['launche_types', 'enable_whitelisted_list']),
+    ...mapState(['launche_types']),
+    ...mapActions('launchpad',[
+      'loadPresales'
+    ]),
     isValidCap() {
       if(this.softCap === 0 || this.hardCap === 0) return 'Softcap and Hardcap must not be 0.';
       if(this.softCap > this.hardCap) return 'Softcap must not exceed Hardcap.';
@@ -512,12 +569,12 @@ export default {
       return '';
     },
     isValidAvailablePresale() {
-      if(this.availableTOkens === 0) return '*Must not be 0.';
-      if(this.availableTokens > this.tokenBalance) return '*Must be smaller than balance.';
+      if(this.availableTokens <= 0) return 'Must be over 0.';
+      if(BigNumber.from(this.availableTokens).gt(this.tokenBalance)) return 'Must be smaller than balance.';
       return '';
     },
     isValidPresaleRate() {
-      if(this.presaleRate === 0) return 'Presale rate must be bigger than 0.';
+      if(this.presaleRate <= 0) return 'Presale rate must be bigger than 0.';
       if(this.availableTokens / this.presaleRate < this.hardCap) return 'Current presale rate couldn\'t reach hardcap.';
       return '';
     },
@@ -528,6 +585,10 @@ export default {
     isValidTime() {
       if(this.startDate < new Date()) return 'Start time passed current time.';
       if(this.startDate > this.endDate) return 'Start time must before end time.';
+      return '';
+    },
+    isValidLiquidityPercentage() {
+      if(this.percentageRaised < 40) return 'must be over 40%';
       return '';
     }
   },
