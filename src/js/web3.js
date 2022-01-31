@@ -166,7 +166,8 @@ export async function getPresales() {
 				return {
 					...presaleInfo,
 					startTime: new Date(presaleInfo.startTime.mul(1000).toNumber()),
-					endTime: new Date(presaleInfo.endTime.mul(1000).toNumber())
+					endTime: new Date(presaleInfo.endTime.mul(1000).toNumber()),
+					createdAt: new Date(presaleInfo.createdAt.mul(1000).toNumber())
 				};
 			});
 
