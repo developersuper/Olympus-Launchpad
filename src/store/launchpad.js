@@ -177,8 +177,7 @@ export default {
     getters: {
       launchesIn24H(state) {
         return state.launches.filter((launch) => {
-          console.log(launch.createdAt.getTime(), Date.now(),  (Date.now() - launch.createdAt.getTime()))
-          return (Date.now() - launch.createdAt.getTime()) < 3600000;
+          return (Date.now() - launch.createdAt.getTime()) < 24 * 3600000;
         }).length;
       },
       totalProjects(state) {

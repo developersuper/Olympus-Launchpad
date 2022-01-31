@@ -5,10 +5,10 @@
       <p class="mt-3 text-white text-base sm:text-xl lg:text-2xl">THE ONLY PLACE TO LAUNCH YOUR TOKEN PROJECTS</p>
     </div>
     <div class="container mx-auto px-4 text-center w-full wow fadeInDown mb-4 mt-12" data-wow-duration="0.3s" data-wow-delay="0.7s">
-      <toggles />
+      <toggles :statuses="statuses" :value="status" @update="status = $event" />
     </div>
 
-    <LaunchSlide v-if="launches.length > 0" />
+    <LaunchSlide v-if="launches.length > 0" :launches="filteredLaunches" />
 
     <div v-if="partners.length > 0" class="container mx-auto px-4 text-center flex place-self-center flex-col w-full wow fadeInDown mt-20 mb-10" data-wow-duration="0.3s" data-wow-delay="0s">
       <h2 class="pb-2">CALL CHANNEL ENDORSED</h2>
@@ -51,7 +51,6 @@ import Logo from "@/components/Logo.vue";
 import largeButton from "@/components/largeButton.vue";
 import Toggles from "./Toggles.vue";
 import { mapGetters, mapState } from 'vuex';
-import TimeLine from "@/components/TimeLine.vue";
 import PartnerSlide from "./PartnerSlide.vue";
 import LaunchSlide from "./LaunchSlide.vue";
 
@@ -66,16 +65,33 @@ export default {
   },
   data() {
     return {
-      progressColor: "#EFBD28",
+      progressColor: '#EFBD28',
+      statuses: ['POPULAR', 'NEWEST', 'ENDING SOON'],
+      status: 'POPULAR',
     };
+  },
+  updated() {
+    console.log(this.status);
   },
   computed: {
     ...mapState(['partner_types', 'partners']),
     ...mapState('launchpad', ['launches']),
     ...mapGetters(['verifiedByParter']),
-    ...mapGetters('launchpad', ['totalProjects', 'launchesIn24H'])
+    ...mapGetters('launchpad', ['totalProjects', 'launchesIn24H']),
+    filteredLaunches() {
+      const temp = [...this.launches];
+      if(this.status === 'NEWEST') {
+        return temp.sort((a, b) => {
+          a.createdAt < b.createdAt; 
+        }).slice(0, 10);
+      }
+      if(this.status === 'ENDING SOON') {
+        return temp.filter(launch => launch.endTime.getTime() > Date.now()).sort((a, b) => {
+          return a.endTime > b.endTime;
+        }).slice(0, 10);
+      }
+      return this.launches;
+    }
   },
-  created() {
-  }
 };
 </script>

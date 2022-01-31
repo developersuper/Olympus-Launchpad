@@ -77,7 +77,6 @@ export default {
   computed: {
     ...mapState(['nowTime']),
     isLive() {
-
       if(this.launch?.isFinalized || this.launch?.startTime.getTime() > this.nowTime || this.launch?.endTime.getTime() < this.nowTime) return false;
       return true;
     }

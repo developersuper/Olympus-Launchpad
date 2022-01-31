@@ -66,7 +66,6 @@ import SwiperCore, { Navigation, Pagination, A11y } from 'swiper';
 
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from 'swiper/vue';
-import TimeLine from '@/components/TimeLine.vue';
 import Card from '@/components/Card.vue';
 import { useWindowSize } from 'vue-window-size';
 import { mapGetters, mapState } from 'vuex';
@@ -81,10 +80,12 @@ SwiperCore.use([Navigation, Pagination, A11y]);
 
 // Import Swiper styles
 export default {
+  props: {
+    launches: Array,
+  },
   components: {
     Swiper,
     SwiperSlide,
-    TimeLine,
     Card
   },
   data() {
@@ -93,11 +94,11 @@ export default {
     };
   },
   computed: {
-    ...mapState('launchpad', ['launches']),
     ...mapState(['partner_types']),
     ...mapGetters(['verifiedByParter']),
   },
-  created() {
+  mounted() {
+    console.log('launches', this.launches);
   },
   methods: {
     onSwiper(swiper) {

@@ -23,7 +23,7 @@ import Rows from "./components/Rows.vue";
 import Head from "./components/Head.vue";
 import Button from "@/components/Button.vue";
 import largeButton from "@/components/largeButton.vue";
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 export default {
   name: "myLaunches",
   components: {
