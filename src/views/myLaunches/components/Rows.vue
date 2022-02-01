@@ -26,7 +26,7 @@
               :class="[
                 'w-full py-2.5 text-sm leading-5 font-medium text-white rounded-lg',
                 'focus:outline-none focus:ring-1 ring-white ring-opacity-60',
-                isJoined ? 'bg-gradient-to-r font-semibold shadow-launchpad_primary from-launchpad_primary to-launchpad_primary-xtra_dark' : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
+                !isCreated ? 'bg-gradient-to-r font-semibold shadow-launchpad_primary from-launchpad_primary to-launchpad_primary-xtra_dark' : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
               ]"
             >
               Joined
@@ -50,7 +50,7 @@
               :class="[
                 'w-full py-2.5 text-sm leading-5 font-medium text-white rounded-lg',
                 'focus:outline-none focus:ring-1 ring-white ring-opacity-60',
-                isEnded ? 'bg-gradient-to-r font-semibold shadow-launchpad_primary from-launchpad_primary to-launchpad_primary-xtra_dark' : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
+                !isActived ? 'bg-gradient-to-r font-semibold shadow-launchpad_primary from-launchpad_primary to-launchpad_primary-xtra_dark' : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
               ]"
             >
               Ended
@@ -108,7 +108,13 @@ export default {
       return true;
     },
     filteredLaunches() {
-      return this.launches.filter(launch => (launch.owner === this.address && this.isLive(launch)));
+      if (this.isCreated) {
+        if (this.isActived) return this.launches.filter(launch => (launch.owner === this.address && this.isLive(launch)));
+        else return this.launches.filter(launch => (launch.owner === this.address && !this.isLive(launch)));
+      } 
+      else {
+        return null;
+      }
     },
   },
   computed: {
