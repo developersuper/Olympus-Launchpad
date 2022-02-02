@@ -35,7 +35,7 @@
 import largeButton from "@/components/largeButton.vue";
 import Logo from "@/components/Logo.vue";
 import launchForm from "@/views/createLaunch/components/launchForm";
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: "createLaunch",
