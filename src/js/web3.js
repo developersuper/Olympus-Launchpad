@@ -1,5 +1,5 @@
 const Web3 = require("web3");
-import { Contract, providers, utils } from 'ethers';
+import { Contract, providers, utils, BigNumber } from 'ethers';
 
 const rpcURL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
 const web3 = new Web3(rpcURL)
@@ -41,9 +41,12 @@ export async function getBalanceOfToken(tokenAddr, userAddr) {
 	try {
 		const provider = getProvider();
 		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
+		if (provider && network && (network.chainId === 97 || network.chainId === 56)) {
 			const contract = new Contract(tokenAddr, miniABI, provider.getSigner());
-			return await contract.balanceOf(userAddr);
+			const decimals = await contract.decimals();
+			const balance = (await contract.balanceOf(userAddr)).div(BigNumber.from('10').pow(decimals)).toNumber();
+			console.log(balance);
+			return balance;
 		}
 	}catch(e) {
 		console.log('Error Occured at getBalanceOfToken', e);
@@ -134,7 +137,7 @@ export async function createPresale(
 				percentageRaised,
 				Math.ceil(startDate / 1000),
 				Math.ceil(endDate / 1000),
-				availableTokens
+				utils.parseEther(availableTokens)
 			];
 			const bools = [
 				isWhitelisted,

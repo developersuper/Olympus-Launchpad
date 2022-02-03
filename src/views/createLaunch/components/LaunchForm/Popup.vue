@@ -40,9 +40,14 @@
 
 <script>
 import { ref } from "vue";
-import { TransitionRoot, TransitionChild, Dialog, DialogOverlay } from "@headlessui/vue";
-import {detectAddress} from "@/js/web3.js";
-
+import { 
+  TransitionRoot, 
+  TransitionChild, 
+  Dialog, 
+  DialogOverlay 
+} from "@headlessui/vue";
+import { detectAddress } from "@/js/web3.js";
+  
 export default {
   data() {
     return {
@@ -62,9 +67,10 @@ export default {
       },
     };
   },
-  watch: {
-    tokenAddress: async function(val) {
-      const myArray = val.split(",");
+  methods: {
+    async passTokenAddr() {
+      const myArray = (this.tokenAddress?.split(",")).map(arr => arr.trim()).filter((arr, index, self) => (arr !== '' && self.indexOf(arr) === index));
+      console.log(myArray)
       for (var i = 0; i < myArray.length; i ++) {
         if (myArray[i].length == 42 && await detectAddress(myArray[i]) == "0x") {
           this.isValidAddress = true;
@@ -72,12 +78,10 @@ export default {
           this.isValidAddress = false;
         }
       }
-    }
-  },
-  methods: {
-    async passTokenAddr() {
-      if (this.isValidAddress) this.$emit('tokenAddress', this.tokenAddress);
-      else return null;
+      if (this.isValidAddress) {
+        this.$emit('tokenAddress', myArray);
+        this.$emit('close');
+      }
     }
   },
   components: {
