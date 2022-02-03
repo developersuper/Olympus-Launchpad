@@ -158,7 +158,7 @@ import {
   getBalanceOfToken,
   approve,
 } from '@/js/web3.js';
-import { uploadImage } from '@/js/service.js';
+// import { uploadImage } from '@/js/service.js';
 
 import slider from 'vue3-slider';
 import LogoUpload from './LaunchForm/LogoUpload.vue';
@@ -198,7 +198,7 @@ export default {
       dateFormat: 'Y-m-d H:i:s',
       time_24hr: true,
     };
-    this.tokenAddress = '0x8cA9095D699d454FEf3400Fbca1a798b9D9e97cB';
+    // this.tokenAddress = '0x8cA9095D699d454FEf3400Fbca1a798b9D9e97cB';
   },
   data() {
     return {

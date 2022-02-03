@@ -32,7 +32,7 @@ export default {
     this.model = {
       ...launches_type,
     };
-    this.$store.dispatch('wallet/connectWallet')
+    // this.$store.dispatch('wallet/connectWallet')
   },
   computed: {
     ...mapGetters('wallet', [
