@@ -60,7 +60,8 @@ export async function setApprove(tokenAddr, amount) {
 		const network = await getCurrentNetwork();
 		if (network.chainId === 97 || network.chainId === 56) {
 			const contract = new Contract(tokenAddr, miniABI, provider.getSigner());
-			return await contract.approve(presaleCreateAddress_dev, amount);
+			console.log(amount, utils.parseEther(amount.toString()).toString());
+			return await contract.approve(presaleCreateAddress_dev, utils.parseEther(amount.toString()));
 		}
 	}catch(e) {
 		console.log('Error Occured at getBalanceOfToken', e);
@@ -95,7 +96,7 @@ export async function approve(address, amount) {
 		const network = await getCurrentNetwork();
 		if (network.chainId === 97 || network.chainId === 56) {
 			const contract = new Contract(address, miniABI, provider.getSigner());
-			return await contract.approve(presaleCreateAddress_dev, amount);
+			return await contract.approve(presaleCreateAddress_dev, utils.parseEther(amount.toString()));
 		}
 	} catch(e) {
 		console.log(e);
@@ -128,6 +129,7 @@ export async function createPresale(
 				tokenAddr,
 				ownerAddr
 			];
+			console.log('at create presale', utils.parseEther(availableTokens.toString()))
 			const uints = [
 				utils.parseEther(softCap.toString()),
 				utils.parseEther(hardCap.toString()),
@@ -137,7 +139,7 @@ export async function createPresale(
 				percentageRaised,
 				Math.ceil(startDate / 1000),
 				Math.ceil(endDate / 1000),
-				utils.parseEther(availableTokens)
+				utils.parseEther(availableTokens.toString())
 			];
 			const bools = [
 				isWhitelisted,
