@@ -1,15 +1,19 @@
 <template>
   <div 
     @click="$router.push(`/partners/${partner_type.id}`)" 
-    class="relative h-full w-full bg-gray-900 px-6 py-8 shadow-smooth border-gray-600 border rounded-2xl flex flex-col items-center justify-between"
+    class="relative w-full min-h-fit bg-gray-900 px-6 py-8 shadow-smooth border-gray-600 border rounded-2xl flex flex-col items-center justify-between"
+    style="min-width: 200px"
   >
     <div class="mb-4 flex flex-col items-center">
       <img
         class="mb-4 bg-opacity-20 w-32 h-32 rounded-full" 
         :src="partner_type.icon" alt="Logo" 
       />
-      <h3 class="text-center gradient-text lg:h-12 xl:h-8">{{ partner_type.name }}</h3>
-      <p class="custom caption p-4 mb-2 mt-2 max-w-100 text-center lg:h-16 xl:h-14">{{ partner_type.description }}</p>
+      <h3 class="text-center gradient-text h-16 sm:h-10">{{ partner_type.name }}</h3>
+      <p 
+        class="custom caption p-4 mb-2 mt-2 max-w-100 text-center lg:h-32 xl:h-24"
+        style="min-height: 140px"
+      >{{ partner_type.description }}</p>
     </div>
     <div class="flex flex-col items-center mb-6">
       <div class="flex flex-row space-x-2 mb-2 mt-5">

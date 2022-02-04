@@ -88,7 +88,6 @@ export default {
 <style lang="sass" scoped>
 
 .swiper-container
-    height: 85vh
     padding: 3rem
     .swiper-wrapper
         .swiper-slide
