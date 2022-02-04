@@ -1,9 +1,13 @@
 import {BNB_BUSD_PAIR_ADR, PAIR_ABI_MIN} from "@/js/constants";
 
 export async function getBNBPrice(web3){
-    let contract = new web3.eth.Contract(PAIR_ABI_MIN, BNB_BUSD_PAIR_ADR);
-    let info = await contract.methods.getReserves().call();
-    return info.reserve1 / info.reserve0;
+    try {
+        let contract = new web3.eth.Contract(PAIR_ABI_MIN, BNB_BUSD_PAIR_ADR);
+        let info = await contract.methods.getReserves().call();
+        return info.reserve1 / info.reserve0;
+    }catch(e) {
+        console.log('Error in getBNBPrice in web3.js:', e);
+    }
 }
 
 export function BNtoString(bn, decimals, minPrecision=18){

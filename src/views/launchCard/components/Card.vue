@@ -52,8 +52,8 @@ export default {
     }
   },
   computed: {
-    ...mapState('wallet', ['address']),
-    ...mapState(['partner_types', 'enable_whitelisted_list', 'provider']),
+    ...mapState('wallet', ['address', 'provider']),
+    ...mapState(['partner_types', 'enable_whitelisted_list']),
     ...mapState('launchpad', ['launches']),
     isLive() {
       if( 
@@ -66,14 +66,14 @@ export default {
   },
   async created () {
     this.loading = true;
-    this.model = await getPresaleInfo(this.$route.params.id, this.provider);
+    this.model = await getPresaleInfo(this.$route.params.id);
     if(this.launches.length === 0) {
-      await this.loadPresales(this.provider);
+      await this.loadPresales();
     }
     this.launch = this.launches.filter(launch => launch.presaleAddr === this.$route.params.id)[0];
     
     if(this.launch && this.model) {
-      const decimals = await getDecimals(this.launch.tokenAddr, this.provider);
+      const decimals = await getDecimals(this.launch.tokenAddr);
       this.model = {
         ...this.launch,
         ...this.model,
@@ -81,7 +81,7 @@ export default {
       }
     }
     if(this.model.isBnb) {
-      this.balance = await getBalance(this.address, this.provider);
+      this.balance = await getBalance(this.address);
     }else {
       this.balance = BigNumber.from('1000000000000000000');
     }

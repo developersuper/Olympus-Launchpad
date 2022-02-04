@@ -30,13 +30,11 @@ export default {
     ...mapActions(['initialize']),
   },
   computed: {
-    ...mapState(['provider', 'web3', 'error'])
+    ...mapState(['error'])
   },
   async created() {
-    if(!this.provider) {
-      await this.initialize();
-    }
-    await this.loadPresales(this.provider);
+    await this.initialize();
+    await this.loadPresales();
   }
 };
 </script>

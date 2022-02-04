@@ -1,15 +1,18 @@
-import { Contract, utils, BigNumber } from 'ethers';
+import { Contract, utils, BigNumber, providers } from 'ethers';
+import Web3 from "web3";
 
 const miniABI = require("./abi/common.json");
 const presaleCreateAbi = require("./abi/presaleCreate.json");
 const presaleAbi = require("./abi/presale.json"); 
+import { RPC } from "@/js/constants";
 
 const presaleCreaterAddress_dev = "0x670833F34e90127D8F779c559545E03bcB09AB81";
 // const presaleCreateAddress_prod = "";
 
-export async function getDecimals(tokenAddr, provider) {
+export async function getDecimals(tokenAddr) {
 	try{
-		const contract = new Contract(tokenAddr, miniABI, provider.getSigner());
+		const provider = new providers.JsonRpcProvider(RPC);
+		const contract = new Contract(tokenAddr, miniABI, provider);
 		const decimals = await contract.decimals();
 		return decimals;
 	}catch(e) {
@@ -18,19 +21,21 @@ export async function getDecimals(tokenAddr, provider) {
 	}
 }
 
-export async function getName(address, provider) {
+export async function getName(address) {
 	try {
-		const contract = new Contract(address, miniABI, provider.getSigner());
+		const provider = new providers.JsonRpcProvider(RPC);
+		const contract = new Contract(address, miniABI, provider);
 		return await contract.symbol();
 	} catch(e) {
-		console.log(e);
+		console.log('Error in getName', e);
 		return '';
 	}
 }
 
-export async function getBalanceOfToken(tokenAddr, userAddr, provider) {
+export async function getBalanceOfToken(tokenAddr, userAddr) {
 	try {
-		const contract = new Contract(tokenAddr, miniABI, provider.getSigner());
+		const provider = new providers.JsonRpcProvider(RPC);
+		const contract = new Contract(tokenAddr, miniABI, provider);
 		const decimals = await contract.decimals();
 		const balance = (await contract.balanceOf(userAddr)).div(BigNumber.from('10').pow(decimals)).toNumber();
 		return balance;
@@ -40,16 +45,22 @@ export async function getBalanceOfToken(tokenAddr, userAddr, provider) {
 	}
 }
 
-export const detectAddress = async (address, web3) => {
-	return await web3.eth.getCode(address);
+export const detectAddress = (address) => {
+	try{
+		return Web3.utils.isAddress(address);
+	}catch(e) {
+		console.log('Error in detectAddress: ', e);
+	}
+
 }
 
 // export async function getMyAccount() {
 // 	return await web3.eth.getAccounts();
 // }
 
-export const getBalance = async (address, provider) => {
+export const getBalance = async (address) => {
 	try{
+		const provider = new providers.JsonRpcProvider(RPC);
 		return await provider.getBalance(address);
 	}catch(e) {
 		console.log('Error in getBalance in web3.js:', e);
@@ -123,8 +134,9 @@ export async function createPresale(
 	}
 }
 
-export async function getPresales(provider) {
+export async function getPresales() {
 	try{
+		const provider = new providers.JsonRpcProvider(RPC);
 		const contract = new Contract(presaleCreaterAddress_dev, presaleCreateAbi, provider);	
 		const presaleInfoList = (await contract.getPresales()).map(presaleInfo => {
 			return {
@@ -141,9 +153,10 @@ export async function getPresales(provider) {
 	}
 }
 
-export async function getPresaleInfo(presaleAddr, provider) {
+export async function getPresaleInfo(presaleAddr) {
 	try {
-		const contract = new Contract(presaleAddr, presaleAbi, provider.getSigner());
+		const provider = new providers.JsonRpcProvider(RPC);
+		const contract = new Contract(presaleAddr, presaleAbi, provider);
 		const presale = await contract.getInfo();
 
 		return {
@@ -158,39 +171,10 @@ export async function getPresaleInfo(presaleAddr, provider) {
 	}
 }
 
-export async function addWhitelist(addresses, provider) {
+export async function checkJoined(address) {
 	try{
-		const contract = new Contract(presaleCreaterAddress_dev, presaleAbi, provider.getSigner());
-		return await contract.addWhitelist(addresses);
-	} catch(e) {
-		console.log(e);
-		return "";
-	}
-}
-
-export async function removeWhitelist(addresses, provider) {
-	try{
-		const contract = new Contract(presaleCreaterAddress_dev, presaleAbi, provider.getSigner());
-		return await contract.removeWhitelist(addresses);
-	} catch(e) {
-		console.log(e);
-		return "";
-	}
-}
-
-export async function getWhitelist(addresses, provider) {
-	try{
-		const contract = new Contract(presaleCreaterAddress_dev, presaleAbi, provider.getSigner());
-		return await contract.getWhitelist(addresses);
-	} catch(e) {
-		console.log(e);
-		return "";
-	}
-}
-
-export async function checkJoined(address, provider) {
-	try{
-		const contract = new Contract(presaleCreaterAddress_dev, presaleAbi, provider.getSigner());
+		const provider = new providers.JsonRpcProvider(RPC);
+		const contract = new Contract(presaleCreaterAddress_dev, presaleAbi, provider);
 		return await contract.joined(address);
 	} catch(e) {
 		console.log(e);

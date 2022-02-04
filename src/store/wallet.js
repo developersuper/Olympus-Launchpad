@@ -1,12 +1,14 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3Modal from "web3modal";
 import Web3 from "web3";
+import { providers } from 'ethers';
 import { BNtoString } from "@/js/utilities.js";
 
 export default {
     namespaced: true, 
     state: () => ({
         web3: null,
+        provider: null,
         address: null,
         balance: null,
         tokens: [],
@@ -92,11 +94,16 @@ export default {
             })
 
             let web3 = new Web3(provider);
+
+            if(window.ethereum) {
+                state.provider = new providers.Web3Provider(window.ethereum, "any"); 
+            }
+
             commit("connectWeb3", web3);
             await dispatch("loadAccount");
 
-            dispatch("locks/loadHolderLocks", state.address, {root:true});
-            dispatch("tokenLocks/loadHolderLocks", state.address, {root:true});
+            // dispatch("locks/loadHolderLocks", state.address, {root:true});
+            // dispatch("tokenLocks/loadHolderLocks", state.address, {root:true});
         }
     }
 }

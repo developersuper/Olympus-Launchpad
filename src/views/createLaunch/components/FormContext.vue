@@ -245,10 +245,10 @@ export default {
   watch: {
     tokenAddress: async function(val) {
       this.loading = true;
-      this.tokenName = await getName(val, this.provider);
-      if (val.length == 42 && await detectAddress(val, this.web3) == "0x" && this.tokenName !== "") {
+      this.tokenName = await getName(val);
+      if (val.length == 42 && detectAddress(val) && this.tokenName !== "") {
         this.isValidAddress = 'correct';
-        this.tokenBalance = await getBalanceOfToken(val, this.address, this.provider);
+        this.tokenBalance = await getBalanceOfToken(val, this.address);
         this.availableTokens = this.tokenBalance;
         this.hardCap = this.availableTokens / this.presaleRate;
         this.softCap = this.hardCap / 2 + 1;
@@ -267,7 +267,7 @@ export default {
       'loadPresales'
     ]),
     async approve() {
-      await this.loadPresales(this.provider);
+      await this.loadPresales();
       await uploadImage(this.imageFile, this.launches[this.launches.length - 1].presaleAddr);
       this.loading = true
       if (
@@ -315,7 +315,7 @@ export default {
       );
       if(result === true) {
         console.log('after creating new presale');
-        await this.loadPresales(this.provider);
+        await this.loadPresales();
         await uploadImage(this.imageFile, this.launches[this.launches.length - 1].presaleAddr);
         this.tokenAddress = '';
       }else {
@@ -338,6 +338,7 @@ export default {
       this.percentageRaised = 40;
       this.bnbLimit = 0.1;
       this.bnbMax = 1.5;
+      this.tokenName= '--';
     },
   },
   computed: {
@@ -345,7 +346,8 @@ export default {
       'address',
       'isWalletConnected',
     ]),
-    ...mapState(['launche_types', 'provider', 'web3']),
+    ...mapState(['launche_types']),
+    ...mapState('wallet', ['provider']),
     ...mapState('launchpad', ['launches']),
     isValidCap() {
       if(this.softCap === 0 || this.hardCap === 0) return 'Softcap and Hardcap must not be 0.';

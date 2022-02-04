@@ -4,9 +4,9 @@ import wallet from "@/store/wallet.js";
 import locks from "@/store/locks.js";
 import launchpad from "@/store/launchpad.js";
 import Web3 from "web3";
-import { providers } from 'ethers';
 import {RPC} from "@/js/constants";
-import {getBNBPrice} from "@/js/utilities";
+import { providers } from "ethers";
+import { getBNBPrice } from "@/js/utilities";
 import tokenLocks from "@/store/tokenLocks";
 
 export default createStore({
@@ -90,7 +90,6 @@ export default createStore({
 
         initialization: null,
         web3: null,
-        provider: null,
         bnbPrice: null,
         nowTime: null,
         error: '',
@@ -106,24 +105,8 @@ export default createStore({
     },
     actions: {
         async initialize(context){
-            let provider = new Web3.providers.HttpProvider(RPC);
-            context.state.web3 = new Web3(provider);
+            context.state.web3 = new Web3(RPC);
 
-            if(window.ethereum) {
-                context.state.provider = new providers.Web3Provider(window.ethereum, "any");
-                const network = await context.state.provider.getNetwork();
-                console.log('network info: ', network, context.state.provider);
-                if(network.name !== 'bnbt') {
-                    context.state.error = 'This is the test version of the Olympus pre-sale platofmr. Please select Binance Test Network in Metamask to continue.'
-                    return;
-                }
-                context.state.error = '';
-            }
-            else {
-                context.state.error = 'This is the test version of the Olympus pre-sale platofmr. Please select Binance Test Network in Metamask to continue.';
-                // context.state.provider = new providers.JsonRpcProvider(RPC);
-                return;
-            }
             if(context.state.timerId) {
                 clearInterval(context.state.timerId);
             }
@@ -131,10 +114,10 @@ export default createStore({
                 context.commit('setNowTime', Date.now());
             }, 1000);
 
-            context.state.bnbPrice = await getBNBPrice(context.state.web3);
+            // context.state.bnbPrice = await getBNBPrice(context.state.web3);
 
-            await context.dispatch("tokenLocks/loadLockList");
-            await context.dispatch("locks/loadLockList");
+            // await context.dispatch("tokenLocks/loadLockList");
+            // await context.dispatch("locks/loadLockList");
 
         },
     },

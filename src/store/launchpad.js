@@ -185,8 +185,8 @@ export default {
       },
     },
     actions: {
-      async loadPresales({ commit }, provider) {
-          const presalesArr = (await getPresales(provider)).map((presale) => ({
+      async loadPresales({ commit }) {
+          const presalesArr = (await getPresales()).map((presale) => ({
             launchType: 'PRE-SALE',
             ...presale,
           }));
