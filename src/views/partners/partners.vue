@@ -5,7 +5,7 @@
         Call Channel Launch Partners
       </h2>
       <Logo class="max-w-75 mx-auto" />
-      <p>View out trust partners recommended launches:</p>
+      <p class="uppercase">View our partners’ endorsed pre-sales below:</p>
     </div>
     <launch-form v-if="launchMode != 0" />
 
