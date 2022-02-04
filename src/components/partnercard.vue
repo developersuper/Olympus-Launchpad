@@ -9,7 +9,7 @@
         class="mb-4 bg-opacity-20 w-32 h-32 rounded-full" 
         :src="partner_type.icon" alt="Logo" 
       />
-      <h3 class="text-center gradient-text sm:h-24 flex items-center">{{ partner_type.name }}</h3>
+      <h3 class="text-center gradient-text h-24 sm:h-15 flex items-center">{{ partner_type.name }}</h3>
       <p 
         class="custom caption p-4 mb-2 mt-2 max-w-100 text-center lg:h-32 xl:h-24"
         style="min-height: 140px"
