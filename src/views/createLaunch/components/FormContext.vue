@@ -216,7 +216,6 @@ export default {
       dateFormat: 'Y-m-d H:i:s',
       time_24hr: true,
     };
-    this.tokenAddress = '0x249B39D42Ff9351568b11f49d9923D1B4155D455'; //dev
   },
   data() {
     return {
