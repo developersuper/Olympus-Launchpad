@@ -4,25 +4,25 @@
       <div class="lg:w-1/2 w-full wow fadeInLeft" data-wow-duration="0.3s" data-wow-delay="0.8s">
         <div class="bg-gray-900 rounded-2xl overflow-hidden p-8 border border-gray-700 text-center">
           <section>
-            <h3 class="font-bold gradient-text">As the token market rises, so too does the platforms that support them</h3>
+            <h3 class="font-bold gradient-text uppercase">As the token market rises, so too does the platforms that support them</h3>
             <p class="mt-8">
               The Forge of Hephaestus is an affordable next generation pre-sale platform. This simple to use utility allows anyone to quickly and safely launch a project or token. Here’s why you should use The Forge:
             </p>
           </section>
           <section>
-            <h3 class="gradient-text mt-8">
+            <h3 class="gradient-text mt-8 uppercase">
               Safe Platform
             </h3>
-            <h3 class="gradient-text mt-8">
+            <h3 class="gradient-text mt-8 uppercase">
               Only 1 BNB to get started
             </h3>
-            <h3 class="gradient-text mt-8">
+            <h3 class="gradient-text mt-8 uppercase">
               Advanced Features
             </h3>
-            <h3 class="gradient-text mt-8">
+            <h3 class="gradient-text mt-8 uppercase">
               Self Service
             </h3>
-            <h3 class="gradient-text mt-8">
+            <h3 class="gradient-text mt-8 uppercase">
               100% of fees earned are re-invested into our products and utilities
             </h3>
           </section>
