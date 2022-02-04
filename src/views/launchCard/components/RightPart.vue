@@ -10,8 +10,10 @@
         :balance="parseWei(balance)" 
         :min="0.1"
         :max="Math.min(parseWei(balance), maxLimit)"
+        :value="parseWei(addAmount)"
         @update="setAddAmount"
       />
+      <div v-if="isValidAmount !== ''" class="text-center text-error-red error-msg">{{ isValidAmount }}</div>
       <div class="flex flex-row max-w justify-between w-full mt-4">
         <div class="md:w-1/3 flex items-center flex-col text-center mb-2">
           <span class="text-xs font-semibold whitespace-nowrap text-center text-gray-200 mb-4">Liquidity Locked</span>
@@ -121,6 +123,10 @@ export default {
     bought: Object,
     isLive: Boolean,
   },
+  created() {
+    this.addAmount = this.model.minBuyLimit;
+    // console.log(this.addAmount, this.parseWei(this.addAmount))
+  },
   data() {
     return {
       addAmount: BigNumber.from('0'),
@@ -147,7 +153,7 @@ export default {
   },
   computed: {
     maxLimit() {
-      return parseFloat(utils.formatEther(this.model.maxBuyLimit.toString())).toFixed(2);
+      return parseFloat(utils.formatEther(this.model.maxBuyLimit.toString()));
     },
     minLimit() {
       return parseFloat(utils.formatEther(this.model.minBuyLimit.toString())).toFixed(2);
@@ -179,8 +185,11 @@ export default {
       ) return true;
       return false;
     },
-  },
-  created() {
+    isValidAmount() {
+      if(this.addAmount.lt(this.model.minBuyLimit)) return 'Must be over minimum limit.';
+      if(this.addAmount.add(this.bought).gt(this.model.maxBuyLimit)) return 'Must be under maximum limit';
+      return '';
+    }
   }
 }
 </script>

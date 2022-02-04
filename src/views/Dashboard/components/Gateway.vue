@@ -2,7 +2,7 @@
   <section class="">
     <div class="container mx-auto px-4 mt-8 lg:mt-24 text-center flex place-self-center flex-col w-full wow fadeInDown" data-wow-duration="0.3s" data-wow-delay="0s">
       <h2 class="pb-2">THE FORGE OF HEPHAESTUS</h2>
-      <p class="mt-3 text-white text-base sm:text-xl lg:text-2xl">THE ONLY PLACE TO LAUNCH YOUR TOKEN PROJECTS</p>
+      <p class="mt-3 text-white text-base sm:text-xl lg:text-2xl">THE BEST PLATFORM TO LAUNCH YOUR NEXT TOKEN PROJECT</p>
     </div>
     <div class="container mx-auto px-4 text-center w-full wow fadeInDown mb-4 mt-12" data-wow-duration="0.3s" data-wow-delay="0.7s">
       <toggles :statuses="statuses" :value="status" @update="status = $event" />

@@ -40,6 +40,7 @@
 
 <script>
 import { ref } from "vue";
+import { mapState } from 'vuex';
 import { 
   TransitionRoot, 
   TransitionChild, 
@@ -67,12 +68,14 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapState(['web3'])
+  },
   methods: {
     async passTokenAddr() {
       const myArray = (this.tokenAddress?.split(",")).map(arr => arr.trim()).filter((arr, index, self) => (arr !== '' && self.indexOf(arr) === index));
-      console.log(myArray)
       for (var i = 0; i < myArray.length; i ++) {
-        if (myArray[i].length == 42 && await detectAddress(myArray[i]) == "0x") {
+        if (myArray[i].length == 42 && await detectAddress(myArray[i], this.web3) == "0x") {
           this.isValidAddress = true;
         } else {
           this.isValidAddress = false;

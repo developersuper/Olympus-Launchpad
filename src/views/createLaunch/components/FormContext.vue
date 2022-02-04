@@ -1,6 +1,7 @@
 
 <template>
   <div class="sm:px-8 px-4 pb-8">
+    <!-- <p v-if="loading">loading...</p> -->
     <!-- Token Address-->
     <div>
       <input
@@ -18,7 +19,10 @@
       <TokenSelect :tokenName="tokenName"/>
       <PresaleOwner :address="address" />
       <LockTokens />
-      <Whitelist :isApproved="isApproved" @whitelisted="whitelistedArray = [...$event];"/>
+      <Whitelist 
+        :isApproved="isApproved"
+        @isWhitelisted="isWhitelisted = $event" 
+        @whitelisted="whitelistedArray = [...$event];"/>
       <!-- Tokens available -->
       <div class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
         <label class="w-full lg:w-3/5 mt-1 block text-sm font-semibold text-gray-100">
@@ -138,14 +142,30 @@
     </div>
     <LaunchSummary />
     <div class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
-      <button @click="approve()" v-wave class="p-6 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0 hover:bg-opacity-20 rounded-lg w-full font-semibold transition-all duration-200">
+      <button 
+        @click="approve()" 
+        v-wave 
+        :class="[
+          isApproved ? 
+          'cursor-not-allowed opacity-70 bg-gray-400' : '',
+          'p-6 border-2 border-launchpad_primary text-launchpad_primary bg-launchpad_primary bg-opacity-0  rounded-lg w-full font-semibold transition-all duration-200']"
+        :disabled="isApproved"
+      >
         {{ isApproved ? 'APPROVED' : 'APPROVE' }}
       </button>
-      <button @click="createLaunch(address)" v-wave :class="[!isApproved ? 'cursor-not-allowed opacity-70 bg-gray-400' : 'hover:bg-opacity-80', 'p-6 bg-launchpad_primary text-gray-900 rounded-lg w-full font-semibold transition-all duration-200']">
+      <button 
+        @click="createLaunch(address)" 
+        v-wave 
+        :class="[
+          !isApproved ? 
+            'cursor-not-allowed opacity-70 bg-gray-400' : 
+            'hover:bg-opacity-80', 'p-6 bg-launchpad_primary text-gray-900 rounded-lg w-full font-semibold transition-all duration-200']"
+        :disabled="!isApproved"
+      >
         CREATE LAUNCH
       </button>
     </div>
-    <div v-if="!isValidAll" class="text-center text-error-red error-msg">Something went wrong.</div>
+    <div v-if="!isValidAll" class="text-center text-error-red error-msg">Something went wrong. Check fields and try again!</div>
   </div>
 </template>
 <script>
@@ -158,7 +178,7 @@ import {
   getBalanceOfToken,
   approve,
 } from '@/js/web3.js';
-// import { uploadImage } from '@/js/service.js';
+import { uploadImage } from '@/js/service.js';
 
 import slider from 'vue3-slider';
 import LogoUpload from './LaunchForm/LogoUpload.vue';
@@ -189,8 +209,6 @@ export default {
     },
     this.startDate = Date.now() + 600000;
     this.endDate = Date.now() + 1000000000;
-    console.log(this.startDate);
-    console.log(this.startDate, this.endDate);
     this.config = {
       enableTime: true,
       enableSeconds: true,
@@ -198,10 +216,11 @@ export default {
       dateFormat: 'Y-m-d H:i:s',
       time_24hr: true,
     };
-    // this.tokenAddress = '0x8cA9095D699d454FEf3400Fbca1a798b9D9e97cB';
+    this.tokenAddress = '0x249B39D42Ff9351568b11f49d9923D1B4155D455'; //dev
   },
   data() {
     return {
+      loading: false,
       imageFile: null,
       config: null,
       isApproved: false,
@@ -209,13 +228,14 @@ export default {
       isValidAll: true,
       presaleOwner: null,
       tokenAddress: '',
+      isWhitelisted: false,
       whitelistedArray: [],
       tokenName: "--",
       startDate: "2022-01-01",
       endDate: "2022-12-12",
       tokenBalance: 0,
       availableTokens: 0,
-      presaleRate: 1,
+      presaleRate: 100,
       hardCap: 100,
       softCap: 51,
       percentageRaised: 40,
@@ -225,10 +245,11 @@ export default {
   },
   watch: {
     tokenAddress: async function(val) {
-      if (val.length == 42 && await detectAddress(val) == "0x" && await getName(val) != "") {
+      this.loading = true;
+      this.tokenName = await getName(val, this.provider);
+      if (val.length == 42 && await detectAddress(val, this.web3) == "0x" && this.tokenName !== "") {
         this.isValidAddress = 'correct';
-        this.tokenName = await getName(val);
-        this.tokenBalance = await getBalanceOfToken(val, this.address);
+        this.tokenBalance = await getBalanceOfToken(val, this.address, this.provider);
         this.availableTokens = this.tokenBalance;
         this.hardCap = this.availableTokens / this.presaleRate;
         this.softCap = this.hardCap / 2 + 1;
@@ -236,13 +257,20 @@ export default {
         this.isValidAddress = 'Invalid token address!  Please try with correct address.';
         this.tokenName = "--";
       }
+      this.loading = false;
     },
     percentageRaised: function (val, oldVal) {
       if(this.isApproved === true) val = oldVal;
-    }
+    },
   },
   methods: {
+    ...mapActions('launchpad',[
+      'loadPresales'
+    ]),
     async approve() {
+      await this.loadPresales(this.provider);
+      await uploadImage(this.imageFile, this.launches[this.launches.length - 1].presaleAddr);
+      this.loading = true
       if (
         this.isValidAddress === 'correct' && 
         this.isValidAvailablePresale === '' && 
@@ -253,20 +281,22 @@ export default {
         this.isValidLiquidityPercentage === ''
       ) {
         
-        const result = await approve(this.tokenAddress, this.availableTokens);
-
+        const result = await approve(this.tokenAddress, this.availableTokens, this.provider);
+      
         if(!result) {
           this.isValidAll = false;
-          return;
+        }else {
+          this.isValidAll = true;
+          this.isApproved = true;
+          if (!this.isWhitelisted) this.whitelistedArray = [];
         }
-        this.isValidAll = true;
-        this.isApproved = true;
-        if (!this.whitelistEnabled) this.whitelistedArray = [];
       } else {
         this.isValidAll = false;
       }
+      this.loading = false;
     },
     async createLaunch() {
+      this.loading = true;
       const result = await createPresale(
         this.tokenAddress,
         this.address,
@@ -279,20 +309,36 @@ export default {
         this.startDate,
         this.endDate,
         this.availableTokens,
-        this.whitelistEnabled,
+        this.isWhitelisted,
         true,
-        this.whitelistedArray
+        this.whitelistedArray,
+        this.provider
       );
       if(result === true) {
-        await this.loadPresales();
-        this.$router.push('/explore');
+        console.log('after creating new presale');
+        await this.loadPresales(this.provider);
+        await uploadImage(this.imageFile, this.launches[this.launches.length - 1].presaleAddr);
+        this.tokenAddress = '';
       }else {
         this.isValidAll = false;
         this.isApproved = false;
       }
+      this.loading = false;
     },
     setApprovedFlag() {
       this.isApproved = true;
+    },
+    init() {
+      this.imageFile = null;
+      this.isApproved = false;
+      this.isValidAll = true;
+      this.isWhitelisted = false;
+      this.whitelistedArray = [];
+      this.startDate = "2022-01-01";
+      this.endDate = "2022-12-12";
+      this.percentageRaised = 40;
+      this.bnbLimit = 0.1;
+      this.bnbMax = 1.5;
     },
   },
   computed: {
@@ -300,10 +346,8 @@ export default {
       'address',
       'isWalletConnected',
     ]),
-    ...mapState(['launche_types']),
-    ...mapActions('launchpad',[
-      'loadPresales'
-    ]),
+    ...mapState(['launche_types', 'provider', 'web3']),
+    ...mapState('launchpad', ['launches']),
     isValidCap() {
       if(this.softCap === 0 || this.hardCap === 0) return 'Softcap and Hardcap must not be 0.';
       if(this.softCap > this.hardCap) return 'Softcap must not exceed Hardcap.';

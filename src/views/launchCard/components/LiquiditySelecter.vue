@@ -19,20 +19,20 @@
           color="#EFBD28" 
           :min="0" 
           :max="100" 
-          :step="5" 
+          :step="0.00000001" 
           :orientation="orientation" 
           @change="setPercentageRaised"
         />
         <div class="bg-gray-600 border border-gray-300 rounded-2xl cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200">
           <div class="rounded-2xl w-full text-gray-200 text-right pt-3 pr-2 text-xs">BALANCE: {{ balance }} </div>
           <input
-            v-model="addAmount"
             placeholder="Amount to add"
             style="height: 42px;"
             type="number"
             :max="max"
             :min="min"
             class="relative w-full bg-gray-600 border border-gray-600 rounded-2xl shadow-sm pl-3 pr-14 py-2 text-left cursor-default sm:text-sm"
+            :value="value"
             @change="updateAddAmount"
           />
         </div>
@@ -48,28 +48,29 @@ export default {
     "vue3-slider": slider,
   },
   props: {
-    balance: Object,
+    value: Number,
+    balance: Number,
     min: Number,
     max: Number,
   },
   data() {
     return {
-      addAmount: 0,
       percentageRaised: 0,
     }
+  },
+  mounted() {
+    this.percentageRaised = this.value * 100 / this.balance;
   },
   methods: {
     setPercentageRaised(e) {
       this.percentageRaised = e;
-      this.addAmount = this.balance * this.percentageRaised / 100;
-      console.log(e, this.percentageRaised, this.addAmount);
-      this.$emit('update', this.addAmount);
+      let addAmount = this.balance * this.percentageRaised / 100;
+      this.$emit('update', addAmount);
     },
     updateAddAmount(e) {
       if(isNaN(e.target.value)) return;
-      this.addAmount = e.target.value;
-      this.percentageRaised = e.target.value / this.balance * 100;
-      this.$emit('update', this.addAmount);
+      this.percentageRaised = e.target.value * 100 / this.balance;
+      this.$emit('update', e.target.value);
     },
   },
   computed: {

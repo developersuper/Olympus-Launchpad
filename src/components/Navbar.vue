@@ -13,7 +13,7 @@
         >
           <div class="text-sm lg:flex-grow flex lg:flex-row flex-col font-semibold place-content-center text-center space-y-6 lg:space-y-0 lg:space-x-8 font-heading">
             <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="[$route.name === 'Explore' ? activeClass : inactiveClass]" to="/explore">Explore</router-link>
-            <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="[$route.name === 'Create' ? activeClass : inactiveClass]" to="/create">Create Launch</router-link>
+            <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="[$route.name === 'Create' ? activeClass : inactiveClass]" to="/create/1">Create Launch</router-link>
             <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="[$route.name === 'myLaunches' ? activeClass : inactiveClass]" to="/mylaunches">My Launches</router-link>
             <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="[$route.name === 'partners' ? activeClass : inactiveClass]" to="/partners">Partners</router-link> 
             <!-- <router-link v-on="isMobile ? { click: toggleMenu } : {}" :class="['opacity-30 cursor-not-allowed']" to="">Partners</router-link> -->

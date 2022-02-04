@@ -54,7 +54,6 @@ export default {
       this.$emit('presaleRate', e.target.value);
     },
     setEditRate() {
-      console.log(this.isEditRate);
       this.isEditRate = true;
     },
     saveEditRate() {

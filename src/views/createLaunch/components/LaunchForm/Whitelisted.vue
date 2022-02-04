@@ -59,6 +59,11 @@ export default {
     Switch,
     Popup,
   },
+  watch: {
+    whitelistEnabled(val) {
+      this.$emit('isWhitelisted', val);
+    }
+  },
   data() {
     return {
       whitelistEnabled: false,
@@ -68,7 +73,6 @@ export default {
   },
   methods: {
     showModal() {
-      console.log('here');
       this.openPopup();
     },
     closeModal() {
@@ -87,7 +91,10 @@ export default {
       this.$emit('whitelisted', this.whitelisted);
     },
     setTokenAddress(e) {
-      this.whitelisted = [...e];
+      this.whitelisted = [
+        ...this.whitelisted,
+        ...e
+      ].filter((arr, index, self) => (arr !== '' && self.indexOf(arr) === index));
       this.$emit('whitelisted', this.whitelisted);
     },
   }

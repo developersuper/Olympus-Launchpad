@@ -11,7 +11,8 @@
 <script>
 import { 
   getPresaleInfo, 
-  // getBalance 
+  getBalance,
+  getDecimals, 
 } from '@/js/web3.js';
 import { mapState, mapActions } from 'vuex';
 
@@ -26,12 +27,13 @@ export default {
   name: "Card",
   data() {
     return {
+      loading: false,
       addAmount: "1",
       liquidityLocked: "40",
       participants: "40",
       circulatingSupply: "40000000",
       progressColor: "#EFBD28",
-      percentageRaised: 1,
+      percentageRaised: 0,
       model: null,
       launch: null,
       balance: BigNumber.from('0'),
@@ -42,7 +44,6 @@ export default {
     RightPart,
   },
   methods: {
-    // bogintific,
     ...mapActions('launchpad',[
       'loadPresales'
     ]),
@@ -52,7 +53,7 @@ export default {
   },
   computed: {
     ...mapState('wallet', ['address']),
-    ...mapState(['partner_types', 'enable_whitelisted_list']),
+    ...mapState(['partner_types', 'enable_whitelisted_list', 'provider']),
     ...mapState('launchpad', ['launches']),
     isLive() {
       if( 
@@ -62,30 +63,30 @@ export default {
       ) return false;
       return true;
     },
-    loading() {
-      if(this.model == undefined || this.model == null) return true;
-      if(this.launch == undefined || this.launch == null) return true;
-      return false;
-    }
   },
-  async mounted () {
-    console.log('mounted called');
-    this.model = await getPresaleInfo(this.$route.params.id);
+  async created () {
+    this.loading = true;
+    this.model = await getPresaleInfo(this.$route.params.id, this.provider);
     if(this.launches.length === 0) {
-      await this.loadPresales();
+      await this.loadPresales(this.provider);
     }
     this.launch = this.launches.filter(launch => launch.presaleAddr === this.$route.params.id)[0];
+    
     if(this.launch && this.model) {
+      const decimals = await getDecimals(this.launch.tokenAddr, this.provider);
       this.model = {
         ...this.launch,
         ...this.model,
+        decimals,
       }
     }
     if(this.model.isBnb) {
-      // this.balance = await getBalance(this.address);
+      this.balance = await getBalance(this.address, this.provider);
+    }else {
+      this.balance = BigNumber.from('1000000000000000000');
     }
-    this.balance = BigNumber.from('1000000000000000000');
-    console.log('started', this.model.tokenAddr, this.address, this.model, this.balance.toString());
+    console.log('getting model in card:', this.model);
+    this.loading = false;
   }
 };
 </script>

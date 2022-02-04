@@ -14,7 +14,21 @@ import "flatpickr/dist/flatpickr.css";
 // Button "ripple" effect
 import VWave from "v-wave";
 
-store.commit("initialize", store.dispatch("initialize"));
+
+window.addEventListener("load", function() {
+  console.log('loading...');
+  if(window.ethereum) {
+    window.ethereum.on('accountsChanged', function (accounts) {
+      console.log('accountsChanges',accounts);
+      
+    });
+    // detect Network account change
+    window.ethereum.on('networkChanged', function(networkId){
+      console.log('networkChanged', networkId);
+      store.dispatch('initialize');
+    });
+  }
+});
 
 createApp(App)
   .use(router)

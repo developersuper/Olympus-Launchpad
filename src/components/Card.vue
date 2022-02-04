@@ -6,7 +6,11 @@
     <img v-if="launch?.partnerType == 4" class="absolute z-20 w-10 h-10 right-6 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/smalcalls.png" alt="Logo" />
     <h4 class="mb-4">{{ launch.tokenName }}</h4>
     <div class="relative">
-      <img class="center-card z-10 w-32 h-32 border-launchpad_primary border-2 rounded-full" :src="launch.src ? launch.src : defaultIcon" alt="Logo" />
+      <img 
+        class="center-card z-10 w-32 h-32 border-launchpad_primary border-2 rounded-full" 
+        :src="this.src" 
+        alt="Logo" 
+      />
       <vc-donut 
         :size="160" 
         background="#081A2E" 
@@ -26,6 +30,7 @@
 </template>
 <script>
 import TimeLine from "@/components/TimeLine.vue";
+import { getLogoURL } from '@/js/service.js';
 
 export default {
   name: 'Card',
@@ -37,7 +42,14 @@ export default {
   },
   data() {
     return {
-      defaultIcon: require('@/assets/icons/unknownToken.svg'),
+      src: null,
+    }
+  },
+  async created() {
+    try{
+      this.src = await getLogoURL(this.launch.presaleAddr);
+    }catch(e){
+      return this.src =  require('@/assets/icons/unknownToken.svg');
     }
   }
 }

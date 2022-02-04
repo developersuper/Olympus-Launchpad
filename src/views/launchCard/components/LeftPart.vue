@@ -17,7 +17,8 @@
           <div class="absolute z-10">
             <img 
               class="w-48 h-48 sm:w-64 sm:h-64 border-launchpad_primary border-2 rounded-full" 
-              :src="this.model.src ? model.src : defaultIcon" alt="Logo" 
+              :src="src" 
+              alt="Logo" 
             />
           </div>
           <vc-donut 
@@ -38,7 +39,7 @@
         </div>
         <div class="flex flex-col w-full">
           <h4 class="font-semibold text-2xl mt-10 gradient-text">
-            {{ model.soldTokens.div(model.rate).toString() }} BNB / {{ model.presaleTokens.div(model?.rate).toString() }} BNB
+            {{ model.soldTokens.div(model.rate).div(parseDecimals(model.decimals)).toString() }} BNB / {{ model.presaleTokens.div(model?.rate).div(parseDecimals(model.decimals)).toString() }} BNB
           </h4>
           <p class="font-semibold mt-2 text-xl text-gray-400 mb-4">{{ model?.soldTokens.mul(100).div(model?.presaleTokens).toString() }}% Complete</p>
           <div class="countdown mt-4 w-44 sm:w-96 mx-auto">
@@ -66,7 +67,11 @@
   </div>
 </template>
 <script>
+import { BigNumber } from 'ethers';
+
 import TimeLine from "@/components/TimeLine.vue";
+import { getLogoURL } from '@/js/service.js'; 
+
 export default {
   components: {
     TimeLine,
@@ -77,7 +82,20 @@ export default {
   },
   data() {
     return {
-      defaultIcon: require('@/assets/icons/unknownToken.svg'),
+      src: null,
+    }
+  },
+  async created() {
+    try{
+      this.src = await getLogoURL(this.model.presaleAddr);
+    }catch(e){
+      return this.src =  require('@/assets/icons/unknownToken.svg');
+    }
+  },
+  methods: {
+    parseDecimals(decimals) {
+      if(isNaN(decimals) || decimals < 0) return;
+      return BigNumber.from('10').pow(decimals);
     }
   }
 }

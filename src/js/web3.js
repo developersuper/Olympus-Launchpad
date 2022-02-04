@@ -1,106 +1,69 @@
-const Web3 = require("web3");
-import { Contract, providers, utils, BigNumber } from 'ethers';
+import { Contract, utils, BigNumber } from 'ethers';
 
-const rpcURL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
-const web3 = new Web3(rpcURL)
 const miniABI = require("./abi/common.json");
 const presaleCreateAbi = require("./abi/presaleCreate.json");
 const presaleAbi = require("./abi/presale.json"); 
 
-const presaleCreateAddress_dev = "0x4EE6e594aD35F852f5c4BC31826D0AB2a809fF63";
-const presaleCreateAddress_prod = "";
+const presaleCreaterAddress_dev = "0x670833F34e90127D8F779c559545E03bcB09AB81";
+// const presaleCreateAddress_prod = "";
 
-export function getEthereum() {
-    return window.ethereum;
+export async function getDecimals(tokenAddr, provider) {
+	try{
+		const contract = new Contract(tokenAddr, miniABI, provider.getSigner());
+		const decimals = await contract.decimals();
+		return decimals;
+	}catch(e) {
+		console.log('Error in getDecimals in web3.js', e);
+		return 18;
+	}
 }
 
-export function getProvider() {
-    return new providers.Web3Provider(getEthereum(), "any");
-}
-
-export async function getCurrentNetwork() {
-    const provider = getProvider();
-    return provider.getNetwork();
-}
-
-export async function getName(address) {
+export async function getName(address, provider) {
 	try {
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(address, miniABI, provider.getSigner());
-			return await contract.symbol();
-		}
+		const contract = new Contract(address, miniABI, provider.getSigner());
+		return await contract.symbol();
 	} catch(e) {
 		console.log(e);
-		return null;
+		return '';
 	}
 }
 
-export async function getBalanceOfToken(tokenAddr, userAddr) {
+export async function getBalanceOfToken(tokenAddr, userAddr, provider) {
 	try {
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (provider && network && (network.chainId === 97 || network.chainId === 56)) {
-			const contract = new Contract(tokenAddr, miniABI, provider.getSigner());
-			const decimals = await contract.decimals();
-			const balance = (await contract.balanceOf(userAddr)).div(BigNumber.from('10').pow(decimals)).toNumber();
-			console.log(balance);
-			return balance;
-		}
+		const contract = new Contract(tokenAddr, miniABI, provider.getSigner());
+		const decimals = await contract.decimals();
+		const balance = (await contract.balanceOf(userAddr)).div(BigNumber.from('10').pow(decimals)).toNumber();
+		return balance;
 	}catch(e) {
 		console.log('Error Occured at getBalanceOfToken', e);
 		return null;
 	}
 }
 
-export async function setApprove(tokenAddr, amount) {
-	try {
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(tokenAddr, miniABI, provider.getSigner());
-			console.log(amount, utils.parseEther(amount.toString()).toString());
-			return await contract.approve(presaleCreateAddress_dev, utils.parseEther(amount.toString()));
-		}
-	}catch(e) {
-		console.log('Error Occured at getBalanceOfToken', e);
-		return null;
-	}
-}
-
-export const detectAddress = async (address) => {
+export const detectAddress = async (address, web3) => {
 	return await web3.eth.getCode(address);
 }
 
-export async function getMyAccount() {
-	return await web3.eth.getAccounts();
-}
+// export async function getMyAccount() {
+// 	return await web3.eth.getAccounts();
+// }
 
-export const getBalance = async (address) => {
-	return await web3.eth.getBalance(address);
-}
-
-export async function getContractAddress() {
-	const network = await getCurrentNetwork();
-	if (network.chainId === 97) {
-		return presaleCreateAddress_dev;
-	} else {
-		return presaleCreateAddress_prod;
+export const getBalance = async (address, provider) => {
+	try{
+		return await provider.getBalance(address);
+	}catch(e) {
+		console.log('Error in getBalance in web3.js:', e);
+		return null;
 	}
 }
 
-export async function approve(address, amount) {
+export async function approve(address, amount, provider) {
 	try{
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(address, miniABI, provider.getSigner());
-			return await contract.approve(presaleCreateAddress_dev, utils.parseEther(amount.toString()));
-		}
+		const contract = new Contract(address, miniABI, provider.getSigner());
+		return await contract.approve(presaleCreaterAddress_dev, utils.parseEther(amount.toString()));
 	} catch(e) {
 		console.log(e);
-		return "";
+		return null;
 	}
 }
 
@@ -118,143 +81,117 @@ export async function createPresale(
 	availableTokens,
 	isWhitelisted,
 	isBnb,
-	whitelist
+	whitelist,
+	provider,
 ) {
 	try{
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(presaleCreateAddress_dev, presaleCreateAbi, provider.getSigner());
-			const addrs = [
-				tokenAddr,
-				ownerAddr
-			];
-			console.log('at create presale', utils.parseEther(availableTokens.toString()))
-			const uints = [
-				utils.parseEther(softCap.toString()),
-				utils.parseEther(hardCap.toString()),
-				presaleRate,
-				utils.parseEther(bnbLimit.toString()),
-				utils.parseEther(bnbMax.toString()),
-				percentageRaised,
-				Math.ceil(startDate / 1000),
-				Math.ceil(endDate / 1000),
-				utils.parseEther(availableTokens.toString())
-			];
-			const bools = [
-				isWhitelisted,
-				isBnb
-			];
-			const whitelistArr = [ ...whitelist ];
-			await contract.createPresale(
-				addrs,
-				uints,
-				bools,
-				whitelistArr
-			);
-			return true;
-		}
+		const contract = new Contract(presaleCreaterAddress_dev, presaleCreateAbi, provider.getSigner());
+		const addrs = [
+			tokenAddr,
+			ownerAddr
+		];
+
+		const uints = [
+			utils.parseEther(softCap.toString()),
+			utils.parseEther(hardCap.toString()),
+			presaleRate,
+			utils.parseEther(bnbLimit.toString()),
+			utils.parseEther(bnbMax.toString()),
+			percentageRaised,
+			Math.ceil(startDate / 1000),
+			Math.ceil(endDate / 1000),
+			utils.parseEther(availableTokens.toString())
+		];
+		const bools = [
+			isWhitelisted,
+			isBnb
+		];
+		const whitelistArr = [ ...whitelist ];
+		await contract.createPresale(
+			addrs,
+			uints,
+			bools,
+			whitelistArr,
+			{
+				value: utils.parseEther('0.0001')
+			}
+		);
+		return true;
 	} catch(e) {
 		console.log('error occured at createpresale', e);
 		return false;
 	}
 }
 
-export async function getPresales() {
+export async function getPresales(provider) {
 	try{
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(presaleCreateAddress_dev, presaleCreateAbi, provider.getSigner());	
-
-			const presaleInfoList = (await contract.getPresales()).map(presaleInfo => {
-				return {
-					...presaleInfo,
-					startTime: new Date(presaleInfo.startTime.mul(1000).toNumber()),
-					endTime: new Date(presaleInfo.endTime.mul(1000).toNumber()),
-					createdAt: new Date(presaleInfo.createdAt.mul(1000).toNumber())
-				};
-			});
-			return presaleInfoList;
-		}
-	} catch(e) {
+		const contract = new Contract(presaleCreaterAddress_dev, presaleCreateAbi, provider);	
+		const presaleInfoList = (await contract.getPresales()).map(presaleInfo => {
+			return {
+				...presaleInfo,
+				startTime: new Date(presaleInfo.startTime.mul(1000).toNumber()),
+				endTime: new Date(presaleInfo.endTime.mul(1000).toNumber()),
+				createdAt: new Date(presaleInfo.createdAt.mul(1000).toNumber())
+			};
+		});
+		return presaleInfoList;
+	}catch(e) {
 		console.log('Error occured in getPresales', e);
 		return "";
 	}
 }
 
-export async function getPresaleInfo(presaleAddr) {
+export async function getPresaleInfo(presaleAddr, provider) {
 	try {
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(presaleAddr, presaleAbi, provider.getSigner());
-			// console.log('here', presaleAddr, provider.getSigner())
-			const presale = await contract.getInfo();
+		const contract = new Contract(presaleAddr, presaleAbi, provider.getSigner());
+		const presale = await contract.getInfo();
 
-			return {
-				...presale,
-				startTime: new Date(presale.startTime.mul(1000).toNumber()),
-				endTime: new Date(presale.endTime.mul(1000).toNumber()),
-				createdAt: new Date(presale.createdAt.mul(1000).toNumber())
-			};
-		}
+		return {
+			...presale,
+			startTime: new Date(presale.startTime.mul(1000).toNumber()),
+			endTime: new Date(presale.endTime.mul(1000).toNumber()),
+			createdAt: new Date(presale.createdAt.mul(1000).toNumber())
+		};
 	}catch(e) {
 		console.log("Error occured!", e);
 		return null;
 	}
 }
 
-export async function addWhitelist(addresses) {
+export async function addWhitelist(addresses, provider) {
 	try{
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(presaleCreateAddress_dev, presaleAbi, provider.getSigner());
-			return await contract.addWhitelist(addresses);
-		}
+		const contract = new Contract(presaleCreaterAddress_dev, presaleAbi, provider.getSigner());
+		return await contract.addWhitelist(addresses);
 	} catch(e) {
 		console.log(e);
 		return "";
 	}
 }
 
-export async function removeWhitelist(addresses) {
+export async function removeWhitelist(addresses, provider) {
 	try{
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(presaleCreateAddress_dev, presaleAbi, provider.getSigner());
-			return await contract.removeWhitelist(addresses);
-		}
+		const contract = new Contract(presaleCreaterAddress_dev, presaleAbi, provider.getSigner());
+		return await contract.removeWhitelist(addresses);
 	} catch(e) {
 		console.log(e);
 		return "";
 	}
 }
 
-export async function getWhitelist(addresses) {
+export async function getWhitelist(addresses, provider) {
 	try{
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(presaleCreateAddress_dev, presaleAbi, provider.getSigner());
-			return await contract.getWhitelist(addresses);
-		}
+		const contract = new Contract(presaleCreaterAddress_dev, presaleAbi, provider.getSigner());
+		return await contract.getWhitelist(addresses);
 	} catch(e) {
 		console.log(e);
 		return "";
 	}
 }
 
-export async function checkJoined(address) {
+export async function checkJoined(address, provider) {
 	try{
-		const provider = getProvider();
-		const network = await getCurrentNetwork();
-		if (network.chainId === 97 || network.chainId === 56) {
-			const contract = new Contract(presaleCreateAddress_dev, presaleAbi, provider.getSigner());
-			return await contract.joined(address);
-		}
+		const contract = new Contract(presaleCreaterAddress_dev, presaleAbi, provider.getSigner());
+		return await contract.joined(address);
 	} catch(e) {
 		console.log(e);
 		return "";
