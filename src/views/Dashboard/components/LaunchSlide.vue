@@ -6,7 +6,7 @@
     :pagination="{ clickable: true }"
     @swiper="onSwiper"
     @slideChange="onSlideChange"
-    class="sm:hidden p-9 "
+    class="sm:block p-9 md:hidden"
   >
     <swiper-slide v-for="launch in launches" :key="launch.tokenAddr">
       <Card 
@@ -21,7 +21,7 @@
     :pagination="{ clickable: true }"
     @swiper="onSwiper"
     @slideChange="onSlideChange"
-    class="hidden sm:block lg:hidden pb-10"
+    class="hidden md:block xl:hidden pb-10"
   >
     <swiper-slide v-for="launch in launches" :key="launch.tokenAddr">
       <Card 
@@ -36,7 +36,7 @@
     :pagination="{ clickable: true }"
     @swiper="onSwiper"
     @slideChange="onSlideChange"
-    class="hidden lg:block xl:hidden pb-10"
+    class="hidden xl:block 2xl:hidden pb-10"
   >
     <swiper-slide v-for="launch in launches" :key="launch.tokenAddr">
       <Card 
@@ -51,7 +51,7 @@
     :pagination="{ clickable: true }"
     @swiper="onSwiper"
     @slideChange="onSlideChange"
-    class="hidden xl:block pb-10"
+    class="hidden 2xl:block pb-10"
   >
     <swiper-slide v-for="launch in launches" :key="launch.tokenAddr">
       <Card 
@@ -66,7 +66,6 @@ import SwiperCore, { Navigation, Pagination, A11y } from 'swiper';
 
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from 'swiper/vue';
-import TimeLine from '@/components/TimeLine.vue';
 import Card from '@/components/Card.vue';
 import { useWindowSize } from 'vue-window-size';
 import { mapGetters, mapState } from 'vuex';
@@ -81,10 +80,12 @@ SwiperCore.use([Navigation, Pagination, A11y]);
 
 // Import Swiper styles
 export default {
+  props: {
+    launches: Array,
+  },
   components: {
     Swiper,
     SwiperSlide,
-    TimeLine,
     Card
   },
   data() {
@@ -93,14 +94,14 @@ export default {
     };
   },
   computed: {
-    ...mapState('launchpad', ['launches']),
     ...mapState(['partner_types']),
     ...mapGetters(['verifiedByParter']),
   },
-  created() {
+  mounted() {
+    console.log('launches', this.launches);
   },
   methods: {
-    onSwiper(swiper) {
+    onSwiper() {
       // console.log(swiper)
     },
     onSlideChange() {

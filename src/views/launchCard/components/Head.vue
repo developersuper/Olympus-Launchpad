@@ -3,9 +3,9 @@
     <div class="heading wow fadeInDown " data-wow-duration="0.3s" data-wow-delay="0s">
       <div class="flex flex-col items-center">  
         <div class="flex flex-row items-center space-x-4">
-          <h2 class="pb-2">
+          <h2>
             LAUNCH: 
-          </h2><img class="w-10 h-10" src="@/assets/icons/olympus.svg" /><h2 class="pb-2">{{ model.tokenName }}</h2>
+          </h2><img class="w-10 h-10 rounded-full" :src="src" /><h2 class="pb-2">{{ model.tokenName }}</h2>
         </div>
       </div>
        <Logo class="max-w-75 mx-auto" />
@@ -25,19 +25,26 @@
 <script>
 // @ is an alias to /src
 // import ItemComp from "@/components/Itemc.vue"
+import { mapState } from 'vuex';
+
 import Logo from "@/components/Logo.vue";
-import { mapGetters, mapState } from 'vuex';
+import { getLogoURL } from '@/js/service.js'; 
 
 export default {
   name: "Head",
   components: {
     Logo,
   },
+  data() {
+    return {
+      src: null,
+    }
+  },
   computed: {
     ...mapState(['partner_types']),
     ...mapState('launchpad', ['launches']),
   },
-  created() {
+  async created() {
     if (this.launches) {
       let launches_data = this.launches.filter((launch) => launch.tokenAddr == this.$route.params.id)[0];
       this.model = {
@@ -45,6 +52,11 @@ export default {
       }
     } else {
       return null;
+    }
+    try{
+      this.src = await getLogoURL(this.$route.params.id);
+    }catch(e){
+      return this.src =  require('@/assets/icons/unknownToken.svg');
     }
   }
 };

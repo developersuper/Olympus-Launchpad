@@ -268,6 +268,11 @@
             "internalType": "uint256",
             "name": "createdAt",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "balance",
+            "type": "uint256"
           }
         ],
         "internalType": "struct Presale.PresaleInfo",

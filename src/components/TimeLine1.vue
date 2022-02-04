@@ -55,7 +55,7 @@ export default {
       return Math.floor(this.leftTime % (60));
     },
     progress() {
-      return ((1.0 * this.launch.soldTokens / this.launch.totalTokens) * 100).toFixed(2);
+      return ((1.0 * (this.nowTime - this.startTime) / (this.endTime - this.startTime)) * 100).toFixed(2);
     },
   }
 };

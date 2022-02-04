@@ -4,6 +4,7 @@ import wallet from "@/store/wallet.js";
 import locks from "@/store/locks.js";
 import launchpad from "@/store/launchpad.js";
 import Web3 from "web3";
+import { providers } from 'ethers';
 import {RPC} from "@/js/constants";
 import {getBNBPrice} from "@/js/utilities";
 import tokenLocks from "@/store/tokenLocks";
@@ -89,8 +90,11 @@ export default createStore({
 
         initialization: null,
         web3: null,
+        provider: null,
         bnbPrice: null,
         nowTime: null,
+        error: '',
+        timerId: null, 
     },
     mutations: {
         initialize(state, initialization){
@@ -104,8 +108,26 @@ export default createStore({
         async initialize(context){
             let provider = new Web3.providers.HttpProvider(RPC);
             context.state.web3 = new Web3(provider);
-            
-            setInterval(() => {
+
+            if(window.ethereum) {
+                context.state.provider = new providers.Web3Provider(window.ethereum, "any");
+                const network = await context.state.provider.getNetwork();
+                console.log('network info: ', network, context.state.provider);
+                if(network.name !== 'bnbt') {
+                    context.state.error = 'This is the test version for bsc test network, please select Bincance Test Network in Metamask!'
+                    return;
+                }
+                context.state.error = '';
+            }
+            else {
+                context.state.error = 'Sorry, currently only metamask support this website.';
+                // context.state.provider = new providers.JsonRpcProvider(RPC);
+                return;
+            }
+            if(context.state.timerId) {
+                clearInterval(context.state.timerId);
+            }
+            context.state.timerId = setInterval(() => {
                 context.commit('setNowTime', Date.now());
             }, 1000);
 

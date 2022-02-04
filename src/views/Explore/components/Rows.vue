@@ -47,6 +47,7 @@ export default {
   },
   data() {
     return {
+      launch_type: "Presale",
       searchValue: ""
     }
   },

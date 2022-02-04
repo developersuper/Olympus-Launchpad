@@ -20,7 +20,7 @@
                 <div class="mt-1 flex flex-col items-center relative">
                   <textarea
                     rows="12"
-                    class="bg-launchpad_primary overline bg-opacity-10 hover:shadow-launchpad_primary focus:shadow-launchpad_primary relative mt-8 border-launchpad_primary transition-all duration-200 placeholder-launchpad_primary text-launchpad_primary rounded-md border p-3 w-full text-center"
+                    class="bg-launchpad_primary overline bg-opacity-10 hover:shadow-launchpad_primary focus:shadow-launchpad_primary relative mt-8 border-launchpad_primary transition-all duration-200 placeholder-launchpad_primary text-launchpad_primary rounded-md border p-3 w-full"
                     placeholder="Enter token address"
                     v-model="tokenAddress"
                   />
@@ -40,9 +40,15 @@
 
 <script>
 import { ref } from "vue";
-import { TransitionRoot, TransitionChild, Dialog, DialogOverlay } from "@headlessui/vue";
-import {detectAddress} from "@/js/web3.js";
-
+import { mapState } from 'vuex';
+import { 
+  TransitionRoot, 
+  TransitionChild, 
+  Dialog, 
+  DialogOverlay 
+} from "@headlessui/vue";
+import { detectAddress } from "@/js/web3.js";
+  
 export default {
   data() {
     return {
@@ -62,22 +68,23 @@ export default {
       },
     };
   },
-  watch: {
-    tokenAddress: async function(val) {
-      const myArray = val.split(",");
+  computed: {
+    ...mapState(['web3'])
+  },
+  methods: {
+    async passTokenAddr() {
+      const myArray = (this.tokenAddress?.split(",")).map(arr => arr.trim()).filter((arr, index, self) => (arr !== '' && self.indexOf(arr) === index));
       for (var i = 0; i < myArray.length; i ++) {
-        if (myArray[i].length == 42 && await detectAddress(myArray[i]) == "0x") {
+        if (myArray[i].length == 42 && await detectAddress(myArray[i], this.web3) == "0x") {
           this.isValidAddress = true;
         } else {
           this.isValidAddress = false;
         }
       }
-    }
-  },
-  methods: {
-    async passTokenAddr() {
-      if (this.isValidAddress) this.$emit('tokenAddress', this.tokenAddress);
-      else return null;
+      if (this.isValidAddress) {
+        this.$emit('tokenAddress', myArray);
+        this.$emit('close');
+      }
     }
   },
   components: {

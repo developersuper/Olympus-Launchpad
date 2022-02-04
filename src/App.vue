@@ -1,15 +1,16 @@
 <template>
   <div class="flex flex-col justify-between min-h-screen">
     <Navbar />
-    <div>
+    <div v-if="error === ''">
       <router-view />
     </div>
+    <div v-else class="text-center text-error-red error-msg">{{ error }}</div>
     <Footer />
     <background style="z-index: -1;" />
   </div>
 </template>
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 import Navbar from "@/components/Navbar.vue";
 import Footer from "@/components/Footer.vue";
@@ -26,9 +27,18 @@ export default {
     ...mapActions('launchpad',[
       'loadPresales'
     ]),
+    ...mapActions(['initialize']),
   },
-  async mounted() {
-    await this.loadPresales();
+  computed: {
+    ...mapState(['provider', 'web3', 'error'])
+  },
+  async created() {
+    if(!this.provider) {
+      await this.initialize();
+    }
+    if(this.error === ''){
+      await this.loadPresales(this.provider);
+    }
   }
 };
 </script>
