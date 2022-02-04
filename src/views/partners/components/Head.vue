@@ -6,10 +6,11 @@
       </h2>
     </div>
     <div class="max-w-75 mx-auto">
-        <img v-if="this.$route.params.id == 1" class="w-full h-full object-contain p-8" src="@/assets/icons/defiapetalk.png" />
-        <img v-if="this.$route.params.id == 2" class="w-full h-full object-contain p-8" src="@/assets/icons/madlab.png" />
-        <img v-if="this.$route.params.id == 3" class="w-full h-full object-contain p-8" src="@/assets/icons/gollum.png" />
-        <img v-if="this.$route.params.id == 4" class="w-full h-full object-contain p-8" src="@/assets/icons/smalcalls.png" />
+        <img v-if="this.$route.params.id == 1" class="w-full h-full object-contain p-8 rounded-full" src="@/assets/icons/midas.jpg" />
+        <img v-if="this.$route.params.id == 2" class="w-full h-full object-contain p-8 rounded-full" src="@/assets/icons/gollum.jpg" />
+        <img v-if="this.$route.params.id == 3" class="w-full h-full object-contain p-8 rounded-full" src="@/assets/icons/defi.jpg" />
+        <img v-if="this.$route.params.id == 4" class="w-full h-full object-contain p-8 rounded-full" src="@/assets/icons/apefam.jpg" />
+        <img v-if="this.$route.params.id == 5" class="w-full h-full object-contain p-8 rounded-full" src="@/assets/icons/early.jpg" />
     </div>
   </section>
 </template>
