@@ -9,9 +9,9 @@
     :breakpoints="swiperOptions.breakpoints"
   >
     <swiper-slide v-for="partner_type in partner_types" :key="partner_type.id">
-        <PartnerCard 
-            :partner_type="partner_type" 
-        />
+      <PartnerCard 
+        :partner_type="partner_type" 
+      />
     </swiper-slide>
   </swiper>
 </template>
@@ -21,10 +21,9 @@ import SwiperCore, { Navigation, Pagination, A11y } from "swiper";
 
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from "swiper/vue";
-import TimeLine from "@/components/TimeLine.vue";
-import PartnerCard from '@/components/partnercard.vue';
+import PartnerCard from '@/components/PartnerCard.vue';
 import { useWindowSize } from 'vue-window-size';
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 // Import Swiper styles
 import "@/assets/scss/main.scss";
@@ -39,7 +38,6 @@ export default {
   components: {
     Swiper,
     SwiperSlide,
-    TimeLine,
     PartnerCard
   },
   data() {
