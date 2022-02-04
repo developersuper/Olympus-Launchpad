@@ -1,6 +1,6 @@
 <template>
   <swiper
-    :slides-per-view="4"
+    :slides-per-view="3"
     :space-between="10"
     navigation
     :pagination="{ clickable: true }"
@@ -56,8 +56,8 @@ export default {
          spaceBetween: 10     
       },   
   
-      771: {       
-         slidesPerView: 4,       
+      1080: {       
+         slidesPerView: 3,       
          spaceBetween: 10     
       } 
     }   
@@ -89,10 +89,8 @@ export default {
 </script>
 <style lang="sass" scoped>
 
-.div
-    height: 80vh
 .swiper-container
-    height: 80vh
+    height: 85vh
     padding: 3rem
     .swiper-wrapper
         .swiper-slide

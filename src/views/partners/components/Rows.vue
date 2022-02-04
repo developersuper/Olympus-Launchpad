@@ -17,10 +17,11 @@
         <div v-if="launche.partnerType == this.$route.params.id" class="relative w-full bg-gray-900 p-6 shadow-smooth border-gray-600 border rounded-2xl flex flex-col items-center">
           <h3 class="mb-2">{{ launche.name }}</h3>
           <img class="absolute z-10 mt-14 w-32 h-32 border-launchpad_primary border-2 rounded-full" src="@/assets/icons/olympus.svg" alt="Logo" />
-          <img v-if="this.$route.params.id == 1" class="absolute z-20 right-5 w-10 h-10 border-launchpad_primary border-1 rounded-full" src="@/assets/icons/defiapetalk.png" alt="Logo" />
-          <img v-if="this.$route.params.id == 2" class="absolute z-20 right-5 w-10 h-10 border-launchpad_primary border-1 rounded-full" src="@/assets/icons/madlab.png" alt="Logo" />
-          <img v-if="this.$route.params.id == 3" class="absolute z-20 right-5 w-10 h-10 border-launchpad_primary border-1 rounded-full" src="@/assets/icons/gollum.png" alt="Logo" />
-          <img v-if="this.$route.params.id == 4" class="absolute z-20 right-5 w-10 h-10 border-launchpad_primary border-1 rounded-full" src="@/assets/icons/smalcalls.png" alt="Logo" />
+          <img v-if="this.$route.params.id == 1" class="absolute z-20 right-5 w-10 h-10 border-launchpad_primary border-1 rounded-full" src="@/assets/icons/midas.jpg" alt="Logo" />
+          <img v-if="this.$route.params.id == 2" class="absolute z-20 right-5 w-10 h-10 border-launchpad_primary border-1 rounded-full" src="@/assets/icons/gollum.jpg" alt="Logo" />
+          <img v-if="this.$route.params.id == 3" class="absolute z-20 right-5 w-10 h-10 border-launchpad_primary border-1 rounded-full" src="@/assets/icons/defi.jpg" alt="Logo" />
+          <img v-if="this.$route.params.id == 4" class="absolute z-20 right-5 w-10 h-10 border-launchpad_primary border-1 rounded-full" src="@/assets/icons/apefam.jpg" alt="Logo" />
+          <img v-if="this.$route.params.id == 5" class="absolute z-20 right-5 w-10 h-10 border-launchpad_primary border-1 rounded-full" src="@/assets/icons/early.jpg" alt="Logo" />
           <img class="absolute z-30 w-4 h-4 right-8 top-14" src="@/assets/icons/sheld.png" alt="Logo" />
           <vc-donut :size="160" background="#081A2E" foreground="#2F455C" :thickness="8" :sections="[{ value: launche.progress, color: progressColor }]"></vc-donut>
           <div class="countdown mt-4 text-center pr-4 pl-4 lg:w-full">
