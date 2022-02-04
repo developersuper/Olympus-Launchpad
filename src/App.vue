@@ -30,7 +30,7 @@ export default {
     ...mapActions(['initialize']),
   },
   computed: {
-    ...mapState(['provider', 'web3'])
+    ...mapState(['provider', 'web3', 'error'])
   },
   async created() {
     if(!this.provider) {

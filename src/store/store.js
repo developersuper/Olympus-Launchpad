@@ -111,18 +111,18 @@ export default createStore({
 
             if(window.ethereum) {
                 context.state.provider = new providers.Web3Provider(window.ethereum, "any");
-                // const network = await context.state.provider.getNetwork();
-                // console.log('network info: ', network, context.state.provider);
-                // if(network.name !== 'bnbt') {
-                //     // context.state.error = 'This is the test version for bsc test network, please select Bincance Test Network in Metamask!'
-                //     return;
-                // }
+                const network = await context.state.provider.getNetwork();
+                console.log('network info: ', network, context.state.provider);
+                if(network.name !== 'bnbt') {
+                    context.state.error = 'This is the test version of the Olympus pre-sale platofmr. Please select Binance Test Network in Metamask to continue.'
+                    return;
+                }
                 context.state.error = '';
             }
             else {
-                // context.state.error = 'Sorry, currently only metamask support this website.';
-                context.state.provider = new providers.JsonRpcProvider(RPC);
-                // return;
+                context.state.error = 'This is the test version of the Olympus pre-sale platofmr. Please select Binance Test Network in Metamask to continue.';
+                // context.state.provider = new providers.JsonRpcProvider(RPC);
+                return;
             }
             if(context.state.timerId) {
                 clearInterval(context.state.timerId);
