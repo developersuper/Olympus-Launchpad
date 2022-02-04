@@ -21,7 +21,7 @@ import SwiperCore, { Navigation, Pagination, A11y } from "swiper";
 
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from "swiper/vue";
-import PartnerCard from '@/components/PartnerCard.vue';
+import PartnerCard from '@/components/partnercard.vue';
 import { useWindowSize } from 'vue-window-size';
 import { mapState } from 'vuex';
 
