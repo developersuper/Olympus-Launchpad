@@ -20,27 +20,53 @@ export default createStore({
         partner_types: [
             {
                 id: 1,
-                name: "DEFIAPETALK",
-                description: "A safe space for apes to find gems",
-                icon: "img/icons/defiapetalk.png"
+                name: "Midas Calls",
+                description: "Midas Calls here",
+                icon: "img/icons/midas.jpg",
+                twitter: "https://twitter.com/midascalls",
+                instagram: "https://www.instagram.com/olympusbsc/?hl=en",
+                telegram: "http://t.me/midascalls",
+                envelope: "mailto:contact@olympustoken.io"
             },
             {
                 id: 2,
-                name: "MAD LAB CRYPTO",
-                description: "Allowing crypto enthusiasts to experiment safely",
-                icon: "img/icons/madlab.png"
+                name: "Gollum's Gems",
+                description: "Finding early and safe gems on the BSC network",
+                icon: "img/icons/gollum.jpg",
+                twitter: "https://mobile.twitter.com/GollumsGems",
+                instagram: "https://www.instagram.com/olympusbsc/?hl=en",
+                telegram: "https://t.me/gollumsgems",
+                envelope: "mailto:contact@olympustoken.io"
             },
             {
                 id: 3,
-                name: "GOLLUM'S GEMS",
-                description: "Finding early and safe gems on the BSC network",
-                icon: "img/icons/gollum.png"
+                name: "DefiApeTalk",
+                description: "A safe space for apes to find gems",
+                icon: "img/icons/defi.jpg",
+                twitter: "https://mobile.twitter.com/GollumsGems",
+                instagram: "https://www.instagram.com/olympusbsc/?hl=en",
+                telegram: "https://t.me/gollumsgems",
+                envelope: "mailto:contact@olympustoken.io"
             },
             {
                 id: 4,
-                name: "SMOL CALLS",
-                description: "Dropping projects and calls Looking for the Gems early",
-                icon: "img/icons/smalcalls.png"
+                name: "ApeFam",
+                description: "A safe space for apes to find gems",
+                icon: "img/icons/apefam.jpg",
+                twitter: "https://mobile.twitter.com/ape_fam_elite",
+                instagram: "https://www.instagram.com/olympusbsc/?hl=en",
+                telegram: "https://t.me/ApeFamEliteCalls",
+                envelope: "mailto:contact@olympustoken.io"
+            },
+            {
+                id: 5,
+                name: "Early Hunter",
+                description: "A safe space for apes to find gems for Indonesia",
+                icon: "img/icons/early.jpg",
+                twitter: "https://mobile.twitter.com/",
+                instagram: "https://www.instagram.com/olympusbsc/?hl=en",
+                telegram: "https://t.me/early_hunter_IDNX",
+                envelope: "mailto:contact@olympustoken.io"
             }
         ],
         launche_types: [
