@@ -20,8 +20,8 @@ export default createStore({
         partner_types: [
             {
                 id: 1,
-                name: "Every project Midas calls turns to gold!",
-                description: "Midas Calls here",
+                name: "Midas Calls",
+                description: "Every project Midas calls turns to gold!",
                 icon: "img/icons/midas.jpg",
                 twitter: "https://twitter.com/midascalls",
                 instagram: "https://www.instagram.com/olympusbsc/?hl=en",
