@@ -3,7 +3,7 @@
 <div v-else class="flex flex-col">
   <div class="flex flex-col bg-gray-900 border border-gray-700 p-4 h-full rounded-2xl lg:flex-row space-x-0 lg:space-y-0 space-y-4 lg:space-x-4 w-full">
     <LeftPart :model="model" :isLive="isLive" />
-    <RightPart :model="model" :balance="balance" :bought="parseEther('0.1')" :isLive="isLive" />
+    <RightPart :model="model" :bought="parseEther('0.1')" :isLive="isLive" />
   </div>
 </div>
 </template>
@@ -11,16 +11,14 @@
 <script>
 import { 
   getPresaleInfo, 
-  getBalance,
   getDecimals, 
 } from '@/js/web3.js';
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 
 import LeftPart from './LeftPart.vue';
 import RightPart from './RightPart.vue';
 import { 
-  utils, 
-  BigNumber 
+  utils,  
 } from 'ethers';
 
 export default {
@@ -36,7 +34,6 @@ export default {
       percentageRaised: 0,
       model: null,
       launch: null,
-      balance: BigNumber.from('0'),
     };
   },
   components: {
@@ -55,6 +52,7 @@ export default {
     ...mapState('wallet', ['address', 'provider']),
     ...mapState(['partner_types', 'enable_whitelisted_list']),
     ...mapState('launchpad', ['launches']),
+    ...mapGetters('wallet', ['isWalletConnected']),
     isLive() {
       if( 
         this.model?.isFinalized || 
@@ -79,11 +77,6 @@ export default {
         ...this.model,
         decimals,
       }
-    }
-    if(this.model.isBnb) {
-      this.balance = await getBalance(this.address);
-    }else {
-      this.balance = BigNumber.from('1000000000000000000');
     }
     console.log('getting model in card:', this.model);
     this.loading = false;

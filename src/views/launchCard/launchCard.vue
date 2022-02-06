@@ -2,7 +2,7 @@
   <div class="container xl:max-w-screen-lg mx-auto px-4 my-6 lg:my-8">
     <Head />
      <div class="flex flex-col lg:flex-row space-x-0 lg:space-y-0 space-y-4 lg:space-x-4 w-full">
-     <div v-if="!isWalletConnected" class="w-full bg-gray-900 rounded-2xl overflow-hidden max-w-2xl mx-auto border border-gray-700 mb-12">
+     <!-- <div v-if="!isWalletConnected" class="w-full bg-gray-900 rounded-2xl overflow-hidden max-w-2xl mx-auto border border-gray-700 mb-12">
         <div class="bg-gray-800 border-b border-gray-700">
           <h3 class="gradient-text w-full py-6 text-center">My Launches</h3>
         </div>
@@ -10,8 +10,8 @@
           <Button name="Connect Wallet" class="connectBtn w-full max-w-64" @click="$store.dispatch('wallet/connectWallet')" />
         </div>
       </div>
-      <Card v-else />
-      <!-- <Card /> -->
+      <Card v-else /> -->
+      <Card />
     </div>
     <div class="container flex lg:flex-row flex-col wow mt-12 lg:mt-20 fadeInDown lg:space-y-0 space-y-4 lg:space-x-4 wow fadeInDown" data-wow-duration="0.6s" data-wow-delay="0.9s">
       <largeButton name="EXPLORE LAUNCHES" btnname="EXPLORE" routername="explore" />
@@ -25,7 +25,7 @@
 import Card from "./components/Card.vue";
 import largeButton from "@/components/largeButton.vue";
 import Head from "./components/Head.vue";
-import Button from "@/components/Button.vue";
+// import Button from "@/components/Button.vue";
 import { mapGetters } from 'vuex';
 
 export default {
@@ -34,7 +34,7 @@ export default {
     Card,
     largeButton,
     Head,
-    Button,
+    // Button,
   },
   computed: {
     ...mapGetters('wallet', ['isWalletConnected'])

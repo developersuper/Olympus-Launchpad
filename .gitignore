@@ -7,9 +7,9 @@
 node_modules/
 dist/
 
+dist.zip
 # Compiled Java class files
 *.class
-
 # Compiled Python bytecode
 *.py[cod]
 

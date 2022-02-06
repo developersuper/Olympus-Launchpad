@@ -97,7 +97,7 @@ export default {
 
             if(window.ethereum) {
                 state.provider = new providers.Web3Provider(window.ethereum, "any"); 
-            }
+            }else state.provider = provider;
 
             commit("connectWeb3", web3);
             await dispatch("loadAccount");

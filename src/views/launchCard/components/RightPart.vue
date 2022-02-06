@@ -4,16 +4,15 @@
     <div class="h-full px-4 pb-4 pt-0 mx-auto">
       <div class="flex items-center bg-gray-900 mx-auto place-content-center p-4 rounded-t-2xl">
         <span class="text-base font-semibold text-gray-200">YOUR ALLOWANCE</span>&nbsp;&nbsp;&nbsp;&nbsp;              
-        <span class="ml-2 gradient-text text-base font-semibold"> {{ Math.max(minLimit, parseWei(bought)) }} / {{ maxLimit }} BNB</span>
+        <span v-if="isWalletConnected" class="ml-2 gradient-text text-base font-semibold"> {{ Math.max(minLimit, parseWei(bought)) }} / {{ maxLimit }} BNB</span>
+        <span v-else class="ml-2 gradient-text text-base font-semibold"> -- / -- BNB</span>
       </div>
       <LiquiditySelecter 
-        :balance="parseWei(balance)" 
-        :min="0.1"
-        :max="Math.min(parseWei(balance), maxLimit)"
+        :model="this.model"
         :value="parseWei(addAmount)"
         @update="setAddAmount"
       />
-      <div v-if="isValidAmount !== ''" class="text-center text-error-red error-msg">{{ isValidAmount }}</div>
+      <div v-if="isValidAmount !== '' && this.isWalletConnected" class="text-center text-error-red error-msg">{{ isValidAmount }}</div>
       <div class="flex flex-row max-w justify-between w-full mt-4">
         <div class="md:w-1/3 flex items-center flex-col text-center mb-2">
           <span class="text-xs font-semibold whitespace-nowrap text-center text-gray-200 mb-4">Liquidity Locked</span>
@@ -82,14 +81,14 @@
       <div class="flex flex-col lg:flex-row space-y-4 w-full lg:space-y-0 lg:space-x-4">
         <button 
           v-wave 
-          class="lg-btn p-4 gradient-color text-gray-100 rounded-lg w-full font-semibold hover:bg-opacity-80 transition-all duration-200"
+          :class="[isDisableFirstButton ? 'cursor-not-allowed opacity-70 bg-gray-400' : 'gradient-color', 'lg-btn p-4 text-gray-100 rounded-lg w-full font-semibold hover:bg-opacity-80 transition-all duration-200']"
           :disabled="isDisableFirstButton"
         >
           {{ buttonTitle }}
         </button>
         <button 
           v-wave 
-          class="lg-btn p-4 border-2 border-gray-500 text-gray-200 bg-gray-400 bg-opacity-0 hover:bg-opacity-20 rounded-lg w-full font-semibold transition-all duration-200"
+          :class="[isDisableSecondButton ? 'cursor-not-allowed opacity-70 bg-gray-400' : '', 'lg-btn p-4 border-2 border-gray-500 text-gray-200 bg-gray-400 bg-opacity-0 hover:bg-opacity-20 rounded-lg w-full font-semibold transition-all duration-200']"
           :disabled="isDisableSecondButton"  
         >
           WITHDRAW INITIAL EARLY
@@ -106,7 +105,8 @@
 </template>
 <script>
 import { bogintific } from '@/js/helpers/filters';
-import { utils, BigNumber } from 'ethers'
+import { utils, BigNumber } from 'ethers';
+import { mapGetters } from 'vuex';
 
 import LiquiditySelecter from './LiquiditySelecter.vue';
 import {
@@ -119,13 +119,11 @@ export default {
   },
   props: {
     model: Object,
-    balance: Object,
     bought: Object,
     isLive: Boolean,
   },
   created() {
-    this.addAmount = this.model.minBuyLimit;
-    // console.log(this.addAmount, this.parseWei(this.addAmount))
+    this.addAmount = this.isWalletConnected ? this.model.minBuyLimit : BigNumber.from('0');
   },
   data() {
     return {
@@ -152,6 +150,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('wallet', ['isWalletConnected']),
     maxLimit() {
       return parseFloat(utils.formatEther(this.model.maxBuyLimit.toString()));
     },
@@ -166,11 +165,11 @@ export default {
     isDisableFirstButton() {
       if(this.buttonTitle === 'BUY') {
         if(
-          Date.now() < this.model.startTime.getTime() ||
-          Date.now() > this.model.endTime.getTime() ||
-          this.balance.isZero() ||
-          this.addAmount.lt(this.model.minBuyLimit) ||
-          this.bought.eq(this.model.maxBuyLimit)
+          !this.isWalletConnected
+          || Date.now() < this.model.startTime.getTime() 
+          || Date.now() > this.model.endTime.getTime() 
+          || this.addAmount.lt(this.model.minBuyLimit) 
+          || this.bought.eq(this.model.maxBuyLimit)
         ) return true;
         return false
       }
@@ -179,9 +178,9 @@ export default {
     isDisableSecondButton() {
       if(
         this.model.isFinalized
+        || !this.isWalletConnected 
         || Date.now() < this.model.startTime.getTime()
         || Date.now() > this.model.endTime.getTime() + 3600000
-        // || this.model.balance.isZero()
       ) return true;
       return false;
     },

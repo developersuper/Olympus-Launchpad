@@ -79,45 +79,15 @@ export async function approve(address, amount, provider) {
 }
 
 export async function createPresale(
-	tokenAddr,
-	ownerAddr,
-	softCap,
-	hardCap,
-	presaleRate,
-	bnbLimit,
-	bnbMax,
-	percentageRaised,
-	startDate,
-	endDate,
-	availableTokens,
-	isWhitelisted,
-	isBnb,
-	whitelist,
+	addrs,
+	uints,
+	bools,
+	whitelistArr,
 	provider,
 ) {
 	try{
 		const contract = new Contract(presaleCreaterAddress_dev, presaleCreateAbi, provider.getSigner());
-		const addrs = [
-			tokenAddr,
-			ownerAddr
-		];
-
-		const uints = [
-			utils.parseEther(softCap.toString()),
-			utils.parseEther(hardCap.toString()),
-			presaleRate,
-			utils.parseEther(bnbLimit.toString()),
-			utils.parseEther(bnbMax.toString()),
-			percentageRaised,
-			Math.ceil(startDate / 1000),
-			Math.ceil(endDate / 1000),
-			utils.parseEther(availableTokens.toString())
-		];
-		const bools = [
-			isWhitelisted,
-			isBnb
-		];
-		const whitelistArr = [ ...whitelist ];
+		console.log('in createpresale', provider, addrs, uints, bools, whitelistArr);
 		await contract.createPresale(
 			addrs,
 			uints,
@@ -138,12 +108,13 @@ export async function getPresales() {
 	try{
 		const provider = new providers.JsonRpcProvider(RPC);
 		const contract = new Contract(presaleCreaterAddress_dev, presaleCreateAbi, provider);	
-		const presaleInfoList = (await contract.getPresales()).map(presaleInfo => {
+		const presaleInfoList = (await contract.getPresales()).map((presaleInfo, idx) => {
 			return {
 				...presaleInfo,
 				startTime: new Date(presaleInfo.startTime.mul(1000).toNumber()),
 				endTime: new Date(presaleInfo.endTime.mul(1000).toNumber()),
-				createdAt: new Date(presaleInfo.createdAt.mul(1000).toNumber())
+				createdAt: new Date(presaleInfo.createdAt.mul(1000).toNumber()),
+				id: idx,
 			};
 		});
 		return presaleInfoList;

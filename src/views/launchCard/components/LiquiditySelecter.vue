@@ -17,22 +17,21 @@
           :height="9" 
           trackColor="#507194" 
           color="#EFBD28" 
-          :min="0" 
-          :max="100" 
+          min="0" 
+          max="100" 
           :step="0.00000001" 
           :orientation="orientation" 
           @change="setPercentageRaised"
         />
         <div class="bg-gray-600 border border-gray-300 rounded-2xl cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200">
-          <div class="rounded-2xl w-full text-gray-200 text-right pt-3 pr-2 text-xs">BALANCE: {{ balance }} </div>
+          <div class="rounded-2xl w-full text-gray-200 text-right pt-3 pr-2 text-xs">BALANCE: {{ isWalletConnected ? parseWei(balance) : '--' }} </div>
           <input
             placeholder="Amount to add"
             style="height: 42px;"
             type="number"
-            :max="max"
-            :min="min"
             class="relative w-full bg-gray-600 border border-gray-600 rounded-2xl shadow-sm pl-3 pr-14 py-2 text-left cursor-default sm:text-sm"
             :value="value"
+            :disabled="!isWalletConnected"
             @change="updateAddAmount"
           />
         </div>
@@ -41,39 +40,55 @@
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex';
 import slider from "vue3-slider";
+import { getBalance } from '@/js/web3.js';
+import { BigNumber, utils } from 'ethers';
 
 export default {
   components: {
     "vue3-slider": slider,
   },
   props: {
+    model: Object,
     value: Number,
-    balance: Number,
-    min: Number,
-    max: Number,
   },
   data() {
     return {
       percentageRaised: 0,
+      balance: BigNumber.from('0'),
     }
   },
-  mounted() {
+  async mounted() {
+    console.log('here', this.model.isBnb, this.isWalletConnected);
+    if(this.model.isBnb && this.isWalletConnected) {
+      this.balance = await getBalance(this.address);
+    }else {
+      this.balance = BigNumber.from('0');
+    }
     this.percentageRaised = this.value * 100 / this.balance;
   },
   methods: {
+    parseWei(wei) {
+      return utils.formatEther(wei);
+    },
     setPercentageRaised(e) {
+      if(!this.isWalletConnected) {
+        this.percentageRaised = 0;
+        return;
+      }
       this.percentageRaised = e;
       let addAmount = this.balance * this.percentageRaised / 100;
       this.$emit('update', addAmount);
     },
     updateAddAmount(e) {
-      if(isNaN(e.target.value)) return;
+      if(isNaN(e.target.value) || !this.isWalletConnected) return;
       this.percentageRaised = e.target.value * 100 / this.balance;
       this.$emit('update', e.target.value);
     },
   },
   computed: {
+    ...mapGetters('wallet', ['isWalletConnected', 'address']),
   },
 }
 </script>
