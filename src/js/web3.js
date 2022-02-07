@@ -6,7 +6,7 @@ const presaleCreateAbi = require("./abi/presaleCreate.json");
 const presaleAbi = require("./abi/presale.json"); 
 import { RPC } from "@/js/constants";
 
-const presaleCreaterAddress_dev = "0x670833F34e90127D8F779c559545E03bcB09AB81";
+const presaleCreaterAddress_dev = "0xcA0536ff00cC28b9C69fe0B91bAE23905A8B1925";
 // const presaleCreateAddress_prod = "";
 
 export async function getDecimals(tokenAddr) {
@@ -53,10 +53,6 @@ export const detectAddress = (address) => {
 	}
 
 }
-
-// export async function getMyAccount() {
-// 	return await web3.eth.getAccounts();
-// }
 
 export const getBalance = async (address) => {
 	try{
@@ -124,10 +120,17 @@ export async function getPresales() {
 	}
 }
 
-export async function getPresaleInfo(presaleAddr) {
+export async function getPresaleInfo(presaleAddr, providerOpt) {
 	try {
-		const provider = new providers.JsonRpcProvider(RPC);
-		const contract = new Contract(presaleAddr, presaleAbi, provider);
+		let contract;
+		if(providerOpt) {
+			contract = new Contract(presaleAddr, presaleAbi, providerOpt);
+		}else {
+
+			const provider = new providers.JsonRpcProvider(RPC);
+			contract = new Contract(presaleAddr, presaleAbi, provider);
+		}
+
 		const presale = await contract.getInfo();
 
 		return {
@@ -150,5 +153,61 @@ export async function checkJoined(address) {
 	} catch(e) {
 		console.log(e);
 		return "";
+	}
+}
+
+export async function buyWithBnb(presaleAddr, amount, provider) {
+	try{
+		console.log('buying...', presaleAddr, amount);
+		const contract = new Contract(presaleAddr, presaleAbi, provider.getSigner());
+		await contract.purchaseWithBnb({value: amount});
+		return true;
+	}catch(e) {
+		console.log(e);
+		return null;
+	}
+}
+
+export async function claim(presaleAddr, provider) {
+	try{
+		const contract = new Contract(presaleAddr, presaleAbi, provider);
+		await contract.claim();
+		return true;
+	}catch(e) {
+		console.log(e);
+		return null;
+	}
+}
+
+export async function emergencyWithdraw(presaleAddr, provider) {
+	try{
+		const contract = new Contract(presaleAddr, presaleAbi, provider);
+		await contract.emergencyWithdraw();
+		return true;
+	}catch(e) {
+		console.log(e);
+		return null;
+	}
+} 
+
+export async function withdraw(presaleAddr, provider) {
+	try{
+		const contract = new Contract(presaleAddr, presaleAbi, provider);
+		await contract.refund();
+		return true;
+	}catch(e) {
+		console.log(e);
+		return null;
+	}
+}
+
+export async function getUserInfo(presaleAddr, provider) {
+	try{
+		const contract = new Contract(presaleAddr, presaleAbi, provider);
+		const userInfo = await contract.getUserInfo();
+		return userInfo;
+	}catch(e) {
+		console.log(e);
+		return null;
 	}
 }

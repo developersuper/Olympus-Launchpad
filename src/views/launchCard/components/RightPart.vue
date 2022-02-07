@@ -83,6 +83,7 @@
           v-wave 
           :class="[isDisableFirstButton ? 'cursor-not-allowed opacity-70 bg-gray-400' : 'gradient-color', 'lg-btn p-4 text-gray-100 rounded-lg w-full font-semibold hover:bg-opacity-80 transition-all duration-200']"
           :disabled="isDisableFirstButton"
+          @click="submitFirstBtn"
         >
           {{ buttonTitle }}
         </button>
@@ -116,11 +117,15 @@
 <script>
 import { bogintific } from '@/js/helpers/filters';
 import { utils, BigNumber } from 'ethers';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 import LiquiditySelecter from './LiquiditySelecter.vue';
 import {
-  
+  buyWithBnb,
+  claim,
+  emergencyWithdraw,
+  withdraw,
+  getUserInfo,
 } from '@/js/web3.js';
 
 export default {
@@ -133,7 +138,7 @@ export default {
     isLive: Boolean,
   },
   created() {
-    this.addAmount = this.isWalletConnected ? this.model.minBuyLimit : BigNumber.from('0');
+    this.addAmount = this.model.minBuyLimit;
   },
   data() {
     return {
@@ -142,26 +147,45 @@ export default {
       participants: "40",
       circulatingSupply: "40000000",
       progressColor: "#EFBD28",
+      userInfo: null,
+    }
+  },
+  watch: {
+    async isWalletConnected(val, oldVal) {
+      if(val && val !== oldVal && this.provider) {
+        console.log(this.provider);
+        this.userInfo = await getUserInfo(this.model.presaleAddr, this.provider);
+      }
     }
   },
   methods: {
     bogintific,
     setAddAmount(e) {
-      console.log(e.toString());
       this.addAmount = utils.parseEther(e.toString());
     },
     parseWei(wei) {
       return utils.formatEther(wei);
     },
     async submitFirstBtn() {
-      if(this.isDisableFirstButton) return;
+      if(this.isDisableFirstButton || !this.provider) return;
+      if(this.buttonTitle === 'BUY') {
+        await buyWithBnb(this.model.presaleAddr, this.addAmount, this.provider);
+      }
+      if(this.buttonTitle === 'CLAIM') {
+        await claim(this.model.presaleAddr, this.provider);
+      }
+      if(this.buttonTitle === 'WITHDRAW') {
+        await withdraw(this.model.presaleAddr, this.provider);
+      }
     },
     async withdrawEmergency() {
       if(this.isDisableSecondButton) return;
+      await emergencyWithdraw(this.model.presaleAddr, this.provider);
     }
   },
   computed: {
     ...mapGetters('wallet', ['isWalletConnected']),
+    ...mapState('wallet', ['provider']),
     maxLimit() {
       return parseFloat(utils.formatEther(this.model.maxBuyLimit.toString()));
     },

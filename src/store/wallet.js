@@ -45,6 +45,9 @@ export default {
         address(state){
             return state.address;
         },
+        provider(state) {
+            return state.provider;
+        },
         addressPreviewShort(state){
             return state.address.substr(0,6);
         },
@@ -85,6 +88,14 @@ export default {
 
             let provider = await web3Modal.connect();
 
+            let web3 = new Web3(provider);
+
+            if(window.ethereum) {
+                state.provider = new providers.Web3Provider(window.ethereum, "any"); 
+            }else state.provider = provider;
+
+            commit("connectWeb3", web3);
+
             provider.on('accountsChanged', () => {
                 dispatch("loadAccount");
             })
@@ -93,13 +104,6 @@ export default {
                 commit("disconnectWallet");
             })
 
-            let web3 = new Web3(provider);
-
-            if(window.ethereum) {
-                state.provider = new providers.Web3Provider(window.ethereum, "any"); 
-            }else state.provider = provider;
-
-            commit("connectWeb3", web3);
             await dispatch("loadAccount");
 
             // dispatch("locks/loadHolderLocks", state.address, {root:true});

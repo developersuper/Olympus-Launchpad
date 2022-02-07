@@ -70,7 +70,7 @@ export default {
   },
   watch: {
     async isWalletConnected(val, oldVal) {
-      if(this.model.isBnb && val && val !== oldVal) {
+      if(this.model.isBnb && val && val !== oldVal && this.address) {
         this.balance = this.parseWei(await getBalance(this.address));
       }
     },
