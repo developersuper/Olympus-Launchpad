@@ -25,7 +25,7 @@
             style="height: 42px;"
             type="number"
             class="relative w-full bg-gray-600 border border-gray-600 rounded-2xl shadow-sm pl-3 pr-14 py-2 text-left cursor-default sm:text-sm"
-            :value="addAmount"
+            :value="value"
             :disabled="!isWalletConnected"
             @change="updateAddAmount"
           />

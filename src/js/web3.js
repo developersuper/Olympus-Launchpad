@@ -181,7 +181,7 @@ export async function claim(presaleAddr, provider) {
 
 export async function emergencyWithdraw(presaleAddr, provider) {
 	try{
-		const contract = new Contract(presaleAddr, presaleAbi, provider);
+		const contract = new Contract(presaleAddr, presaleAbi, provider.getSigner());
 		await contract.emergencyWithdraw();
 		return true;
 	}catch(e) {
@@ -192,7 +192,7 @@ export async function emergencyWithdraw(presaleAddr, provider) {
 
 export async function withdraw(presaleAddr, provider) {
 	try{
-		const contract = new Contract(presaleAddr, presaleAbi, provider);
+		const contract = new Contract(presaleAddr, presaleAbi, provider.getSigner());
 		await contract.refund();
 		return true;
 	}catch(e) {
@@ -203,8 +203,9 @@ export async function withdraw(presaleAddr, provider) {
 
 export async function getUserInfo(presaleAddr, provider) {
 	try{
-		const contract = new Contract(presaleAddr, presaleAbi, provider);
+		const contract = new Contract(presaleAddr, presaleAbi, provider.getSigner());
 		const userInfo = await contract.getUserInfo();
+		console.log(userInfo);
 		return userInfo;
 	}catch(e) {
 		console.log(e);

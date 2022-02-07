@@ -4,7 +4,7 @@
     <div class="h-full w-full px-4 pb-4 pt-0 mx-auto">
       <div class="flex items-center bg-gray-900 mx-auto place-content-center p-4 rounded-t-2xl">
         <span class="text-base font-semibold text-gray-200">YOUR ALLOWANCE</span>&nbsp;&nbsp;&nbsp;&nbsp;              
-        <span v-if="isWalletConnected" class="ml-2 gradient-text text-base font-semibold"> {{ Math.max(minLimit, parseWei(bought)) }} / {{ maxLimit }} BNB</span>
+        <span v-if="isWalletConnected" class="ml-2 gradient-text text-base font-semibold"> {{ Math.max(minLimit, parseWei(balance)) }} / {{ maxLimit }} BNB</span>
         <span v-else class="ml-2 gradient-text text-base font-semibold"> -- / -- BNB</span>
       </div>
       <LiquiditySelecter 
@@ -91,6 +91,7 @@
           v-wave 
           :class="[isDisableSecondButton ? 'cursor-not-allowed opacity-70 bg-gray-400' : '', 'lg-btn p-4 border-2 border-gray-500 text-gray-200 bg-gray-400 bg-opacity-0 hover:bg-opacity-20 rounded-lg w-full font-semibold transition-all duration-200']"
           :disabled="isDisableSecondButton"  
+          @click="withdrawEmergency"
         >
           WITHDRAW INITIAL EARLY
         </button>
@@ -125,7 +126,7 @@ import {
   claim,
   emergencyWithdraw,
   withdraw,
-  getUserInfo,
+  getUserInfo
 } from '@/js/web3.js';
 
 export default {
@@ -134,10 +135,9 @@ export default {
   },
   props: {
     model: Object,
-    bought: Object,
     isLive: Boolean,
   },
-  created() {
+  mounted() {
     this.addAmount = this.model.minBuyLimit;
   },
   data() {
@@ -147,14 +147,19 @@ export default {
       participants: "40",
       circulatingSupply: "40000000",
       progressColor: "#EFBD28",
-      userInfo: null,
+      balance: BigNumber.from('0'),
+      buyable: false,
+      claimed: false,
     }
   },
   watch: {
     async isWalletConnected(val, oldVal) {
       if(val && val !== oldVal && this.provider) {
         console.log(this.provider);
-        this.userInfo = await getUserInfo(this.model.presaleAddr, this.provider);
+        const userInfo = await getUserInfo(this.model.presaleAddr, this.provider);
+        this.balance = userInfo.balance;
+        this.buyable = userInfo.buyable;
+        this.claimed = userInfo.claimed;
       }
     }
   },
@@ -177,10 +182,15 @@ export default {
       if(this.buttonTitle === 'WITHDRAW') {
         await withdraw(this.model.presaleAddr, this.provider);
       }
+      this.updatePage();
     },
     async withdrawEmergency() {
       if(this.isDisableSecondButton) return;
       await emergencyWithdraw(this.model.presaleAddr, this.provider);
+      this.updatePage();
+    },
+    updatePage() {
+      location.reload();
     }
   },
   computed: {
@@ -201,10 +211,26 @@ export default {
       if(this.buttonTitle === 'BUY') {
         if(
           !this.isWalletConnected
+          || !this.buyable
           || Date.now() < this.model.startTime.getTime() 
           || Date.now() > this.model.endTime.getTime() 
           || this.addAmount.lt(this.model.minBuyLimit) 
-          || this.bought.eq(this.model.maxBuyLimit)
+          || this.balance.eq(this.model.maxBuyLimit)
+        ) return true;
+        return false
+      }
+      if(this.buttonTitle === 'CLAIM') {
+        if(
+          !this.isWalletConnected
+          || this.claimed
+          || this.balance.gt(0)
+        ) return true;
+        return false
+      }
+      if(this.buttonTitle === 'WITHDRAW') {
+        if(
+          !this.isWalletConnected
+          || this.balance.gt(0)
         ) return true;
         return false
       }
@@ -214,6 +240,7 @@ export default {
       if(
         this.model.isFinalized
         || !this.isWalletConnected 
+        || this.balance.eq(0)
         || Date.now() < this.model.startTime.getTime()
         || Date.now() > this.model.endTime.getTime() + 3600000
       ) return true;
@@ -221,7 +248,7 @@ export default {
     },
     isValidAmount() {
       if(this.addAmount.lt(this.model.minBuyLimit)) return 'Must be over minimum limit.';
-      if(this.addAmount.add(this.bought).gt(this.model.maxBuyLimit)) return 'Must be under maximum limit';
+      if(this.addAmount.add(this.balance).gt(this.model.maxBuyLimit)) return 'Must be under maximum limit';
       return '';
     }
   }

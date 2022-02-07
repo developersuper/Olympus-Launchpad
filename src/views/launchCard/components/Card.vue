@@ -5,7 +5,7 @@
   <div v-else class="flex flex-col w-full">
     <div class="flex flex-1 flex-col bg-gray-900 border border-gray-700 p-4 h-full rounded-2xl lg:flex-row space-x-0 lg:space-y-0 space-y-4 lg:space-x-4 w-full">
       <LeftPart class="" :model="model" :isLive="isLive" />
-      <RightPart :model="model" :bought="parseEther('0.1')" :isLive="isLive" />
+      <RightPart :model="model" :isLive="isLive" />
     </div>
   </div>
 </div>
