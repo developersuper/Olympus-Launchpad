@@ -24,7 +24,7 @@
           @change="setPercentageRaised"
         />
         <div class="bg-gray-600 border border-gray-300 rounded-2xl cursor-default focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-200">
-          <div class="rounded-2xl w-full text-gray-200 text-right pt-3 pr-2 text-xs">BALANCE: {{ isWalletConnected ? parseWei(balance) : '--' }} </div>
+          <div class="rounded-2xl w-full text-gray-200 text-right pt-3 pr-2 text-xs">BALANCE: {{ isWalletConnected ? balance : '--' }} </div>
           <input
             placeholder="Amount to add"
             style="height: 42px;"
@@ -56,35 +56,43 @@ export default {
   data() {
     return {
       percentageRaised: 0,
-      balance: BigNumber.from('0'),
+      balance: '0',
     }
   },
   async mounted() {
-    console.log('here', this.model.isBnb, this.isWalletConnected);
     if(this.model.isBnb && this.isWalletConnected) {
-      this.balance = await getBalance(this.address);
+      this.balance = this.parseWei(await getBalance(this.address));
     }else {
-      this.balance = BigNumber.from('0');
+      this.balance = '0';
     }
     this.percentageRaised = this.value * 100 / this.balance;
   },
+  watch: {
+    async isWalletConnected(val, oldVal) {
+      if(this.model.isBnb && val && val !== oldVal) {
+        this.balance = this.parseWei(await getBalance(this.address));
+      }
+    }
+  },
   methods: {
     parseWei(wei) {
-      return utils.formatEther(wei);
+      return parseFloat(utils.formatEther(wei));
     },
     setPercentageRaised(e) {
       if(!this.isWalletConnected) {
         this.percentageRaised = 0;
         return;
       }
-      this.percentageRaised = e;
+      this.percentageRaised = parseFloat(e);
       let addAmount = this.balance * this.percentageRaised / 100;
+      console.log('addAmount', addAmount);
       this.$emit('update', addAmount);
     },
     updateAddAmount(e) {
       if(isNaN(e.target.value) || !this.isWalletConnected) return;
-      this.percentageRaised = e.target.value * 100 / this.balance;
-      this.$emit('update', e.target.value);
+      let addAmount = e.target.value;
+      this.percentageRaised = addAmount * 100 / this.balance;
+      this.$emit('update', addAmount);
     },
   },
   computed: {

@@ -137,7 +137,9 @@ export default {
   methods: {
     bogintific,
     setAddAmount(e) {
+      console.log('event', e);
       this.addAmount = utils.parseEther(e.toString());
+      console.log(this.addAmount.toString());
     },
     parseWei(wei) {
       return utils.formatEther(wei);
@@ -185,6 +187,7 @@ export default {
       return false;
     },
     isValidAmount() {
+      console.log('addAmount in rightcard', this.addAmount);
       if(this.addAmount.lt(this.model.minBuyLimit)) return 'Must be over minimum limit.';
       if(this.addAmount.add(this.bought).gt(this.model.maxBuyLimit)) return 'Must be under maximum limit';
       return '';

@@ -5,7 +5,7 @@
         <div class="flex flex-row items-center space-x-4">
           <h2>
             LAUNCH: 
-          </h2><img class="w-10 h-10 rounded-full" :src="src" /><h2 class="pb-2">{{ model.tokenName }}</h2>
+          </h2><img class="w-10 h-10 rounded-full" :src="src" /><h2 class="pb-2">{{ model ? model.tokenName : '--' }}</h2>
         </div>
       </div>
        <Logo class="max-w-75 mx-auto" />
@@ -25,8 +25,6 @@
 <script>
 // @ is an alias to /src
 // import ItemComp from "@/components/Itemc.vue"
-import { mapState } from 'vuex';
-
 import Logo from "@/components/Logo.vue";
 import { getLogoURL } from '@/js/service.js'; 
 
@@ -35,28 +33,27 @@ export default {
   components: {
     Logo,
   },
+  props: {
+    model: Object,
+  },
   data() {
     return {
       src: null,
     }
   },
-  computed: {
-    ...mapState(['partner_types']),
-    ...mapState('launchpad', ['launches']),
-  },
   async created() {
-    if (this.launches) {
-      let launches_data = this.launches.filter((launch) => launch.tokenAddr == this.$route.params.id)[0];
-      this.model = {
-        ...launches_data,
+    await this.loadLogo();
+  },
+  async updated() {
+    await this.loadLogo();
+  },
+  methods: {
+    async loadLogo() {
+      try{
+        this.src = await getLogoURL(this.model.id);
+      }catch(e){
+        return this.src =  require('@/assets/icons/unknownToken.svg');
       }
-    } else {
-      return null;
-    }
-    try{
-      this.src = await getLogoURL(this.$route.params.id);
-    }catch(e){
-      return this.src =  require('@/assets/icons/unknownToken.svg');
     }
   }
 };

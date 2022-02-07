@@ -170,7 +170,7 @@
 </template>
 <script>
 import { mapGetters, mapState, mapActions } from 'vuex';
-import  { utils } from 'ethers';
+import  { utils, BigNumber } from 'ethers';
 
 import {
   detectAddress, 
@@ -178,6 +178,7 @@ import {
   createPresale, 
   getBalanceOfToken,
   approve,
+  getDecimals,
 } from '@/js/web3.js';
 import { uploadImage } from '@/js/service.js';
 
@@ -240,6 +241,7 @@ export default {
       bnbLimit: 0.1,
       bnbMax: 1.5,
       error: '',
+      decimals: 18,
     };
   },
   watch: {
@@ -255,6 +257,7 @@ export default {
         this.tokenBalance = await getBalanceOfToken(val, this.address);
         this.availableTokens = this.tokenBalance;
         this.hardCap = this.availableTokens / this.presaleRate;
+        this.decimals = await getDecimals(val);
         this.softCap = this.hardCap / 2 + 1;
       } else {
         this.isValidAddress = 'Invalid token address!  Please try with correct address.';
@@ -312,7 +315,7 @@ export default {
           this.percentageRaised,
           Math.ceil((new Date(this.startDate)).getTime() / 1000),
           Math.ceil((new Date(this.endDate)).getTime() / 1000),
-          utils.parseEther(this.availableTokens.toString())
+          BigNumber.from(this.availableTokens.toString()).mul(BigNumber.from('10').pow(this.decimals))
         ];
         const bools = [
           this.isWhitelisted,

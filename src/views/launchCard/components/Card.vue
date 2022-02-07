@@ -1,9 +1,12 @@
 <template>
-<div v-if="loading">Loading..</div>
-<div v-else class="flex flex-col">
-  <div class="flex flex-col bg-gray-900 border border-gray-700 p-4 h-full rounded-2xl lg:flex-row space-x-0 lg:space-y-0 space-y-4 lg:space-x-4 w-full">
-    <LeftPart :model="model" :isLive="isLive" />
-    <RightPart :model="model" :bought="parseEther('0.1')" :isLive="isLive" />
+<Head :model="model"/>
+<div class="flex flex-col lg:flex-row space-x-0 lg:space-y-0 space-y-4 lg:space-x-4 w-full">
+  <div v-if="loading">Loading..</div>
+  <div v-else class="flex flex-col">
+    <div class="flex flex-col bg-gray-900 border border-gray-700 p-4 h-full rounded-2xl lg:flex-row space-x-0 lg:space-y-0 space-y-4 lg:space-x-4 w-full">
+      <LeftPart :model="model" :isLive="isLive" />
+      <RightPart :model="model" :bought="parseEther('0.1')" :isLive="isLive" />
+    </div>
   </div>
 </div>
 </template>
@@ -17,6 +20,7 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 
 import LeftPart from './LeftPart.vue';
 import RightPart from './RightPart.vue';
+import Head from './Head.vue';
 import { 
   utils,  
 } from 'ethers';
@@ -39,6 +43,7 @@ export default {
   components: {
     LeftPart,
     RightPart,
+    Head,
   },
   methods: {
     ...mapActions('launchpad',[
