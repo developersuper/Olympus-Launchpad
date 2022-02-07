@@ -1,7 +1,7 @@
 <template>
-<div class="w-full wow fadeInDown" data-wow-duration="0.3s" data-wow-delay="0.4s">
+<div class="w-hull w-full wow fadeInDown" data-wow-duration="0.3s" data-wow-delay="0.4s">
   <div class="text-center flex flex-col justify-between h-full items-center">
-    <div class="h-full px-4 pb-4 pt-0 mx-auto">
+    <div class="h-full w-full px-4 pb-4 pt-0 mx-auto">
       <div class="flex items-center bg-gray-900 mx-auto place-content-center p-4 rounded-t-2xl">
         <span class="text-base font-semibold text-gray-200">YOUR ALLOWANCE</span>&nbsp;&nbsp;&nbsp;&nbsp;              
         <span v-if="isWalletConnected" class="ml-2 gradient-text text-base font-semibold"> {{ Math.max(minLimit, parseWei(bought)) }} / {{ maxLimit }} BNB</span>
@@ -78,7 +78,7 @@
         </div>
       </div>
 
-      <div class="flex flex-col lg:flex-row space-y-4 w-full lg:space-y-0 lg:space-x-4">
+      <div v-if="isWalletConnected" class="flex flex-col lg:flex-row space-y-4 w-full lg:space-y-0 lg:space-x-4">
         <button 
           v-wave 
           :class="[isDisableFirstButton ? 'cursor-not-allowed opacity-70 bg-gray-400' : 'gradient-color', 'lg-btn p-4 text-gray-100 rounded-lg w-full font-semibold hover:bg-opacity-80 transition-all duration-200']"
@@ -94,9 +94,19 @@
           WITHDRAW INITIAL EARLY
         </button>
       </div>
+      <div v-else class="flex flex-col lg:flex-row space-y-4 w-full lg:space-y-0 lg:space-x-4">
+        <button 
+          v-wave 
+          class="gradient-color lg-btn p-4 text-gray-100 rounded-lg w-full font-semibold hover:bg-opacity-80 transition-all duration-200"
+          @click="$store.dispatch('wallet/connectWallet')"
+        >
+          PARTICIPATE
+        </button>
+      </div>
+
       <div class="flex items-end sm:justify-end">
         <div class="w-full sm:w-1/2">
-        <p class="mt-5 text-gray-300 text-sm sm:text-xs">Claim your full initial deposit up to 1 hour before launch ends. There is a 10% fee for withdrawing early.</p>
+        <p v-show="isWalletConnected" class="mt-5 text-gray-300 text-sm sm:text-xs">Claim your full initial deposit up to 1 hour before launch ends. There is a 10% fee for withdrawing early.</p>
         </div>
       </div>
     </div>
@@ -137,9 +147,8 @@ export default {
   methods: {
     bogintific,
     setAddAmount(e) {
-      console.log('event', e);
+      console.log(e.toString());
       this.addAmount = utils.parseEther(e.toString());
-      console.log(this.addAmount.toString());
     },
     parseWei(wei) {
       return utils.formatEther(wei);
@@ -187,7 +196,6 @@ export default {
       return false;
     },
     isValidAmount() {
-      console.log('addAmount in rightcard', this.addAmount);
       if(this.addAmount.lt(this.model.minBuyLimit)) return 'Must be over minimum limit.';
       if(this.addAmount.add(this.bought).gt(this.model.maxBuyLimit)) return 'Must be under maximum limit';
       return '';
