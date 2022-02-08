@@ -182,16 +182,12 @@ export default {
       if(this.buttonTitle === 'WITHDRAW') {
         await withdraw(this.model.presaleAddr, this.provider);
       }
-      this.updatePage();
     },
     async withdrawEmergency() {
       if(this.isDisableSecondButton) return;
       await emergencyWithdraw(this.model.presaleAddr, this.provider);
-      this.updatePage();
+      // this.updatePage();
     },
-    updatePage() {
-      location.reload();
-    }
   },
   computed: {
     ...mapGetters('wallet', ['isWalletConnected']),
