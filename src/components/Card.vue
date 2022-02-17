@@ -47,7 +47,7 @@ export default {
   },
   async created() {
     try{
-      this.src = await getLogoURL(this.launch.presaleAddr);
+      this.src = await getLogoURL(this.launch.id);
     }catch(e){
       return this.src =  require('@/assets/icons/unknownToken.svg');
     }

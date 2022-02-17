@@ -25,7 +25,7 @@
             class="hidden sm:block" 
             :size="324" background="#081A2E" label="76" foreground="#2F455C" :thickness="12" 
             :sections="[{ 
-              value: model.soldTokens.mul(100).div(model.presaleTokens).toNumber(), 
+              value: formatEther(model.soldTokens.toString()) * 100 / formatEther(model.presaleTokens.toString()), 
               color: progressColor 
             }]"
           ></vc-donut>
@@ -33,15 +33,15 @@
             class="sm:hidden" 
             :size="240" background="#081A2E" foreground="#2F455C" :thickness="10" 
             :sections="[{ 
-              value: model.soldTokens.mul(100).div(model.presaleTokens).toNumber(), 
+              value: formatEther(model.soldTokens.toString()) * 100 / formatEther(model.presaleTokens.toString()), 
               color: progressColor 
           }]"></vc-donut>
         </div>
         <div class="flex flex-col w-full">
           <h4 class="font-semibold text-2xl mt-10 gradient-text">
-            {{ model.soldTokens.div(model.rate).div(parseDecimals(model.decimals)).toString() }} BNB / {{ model.presaleTokens.div(model?.rate).div(parseDecimals(model.decimals)).toString() }} BNB
+            {{ formatEther(model.fundRaised.toString()) }} BNB / {{ model.presaleTokens.div(model?.rate).div(parseDecimals(model.decimals)).toString() }} BNB
           </h4>
-          <p class="font-semibold mt-2 text-xl text-gray-400 mb-4">{{ model?.soldTokens.mul(100).div(model?.presaleTokens).toString() }}% Complete</p>
+          <p class="font-semibold mt-2 text-xl text-gray-400 mb-4">{{ formatEther(model.soldTokens.toString()) * 100 / formatEther(model.presaleTokens.toString()) }}% Complete</p>
           <div class="countdown mt-4 w-44 sm:w-96 mx-auto">
             <TimeLine :startTime="model?.startTime" :endTime="model?.endTime" :launch="model" />
           </div>
@@ -67,7 +67,7 @@
   </div>
 </template>
 <script>
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 
 import TimeLine from "@/components/TimeLine.vue";
 import { getLogoURL } from '@/js/service.js'; 
@@ -83,19 +83,26 @@ export default {
   data() {
     return {
       src: null,
+      progressColor: "#EFBD28"
     }
   },
   async created() {
     try{
-      this.src = await getLogoURL(this.model.presaleAddr);
+      this.src = await getLogoURL(this.model.id);
     }catch(e){
       return this.src =  require('@/assets/icons/unknownToken.svg');
     }
+  },
+  mounted() {
+    console.log(this.formatEther(this.model.soldTokens.toString()) * 100 / this.formatEther(this.model.presaleTokens.toString()), )
   },
   methods: {
     parseDecimals(decimals) {
       if(isNaN(decimals) || decimals < 0) return;
       return BigNumber.from('10').pow(decimals);
+    },
+    formatEther(ether) {
+      return utils.formatEther(ether);
     }
   }
 }

@@ -39,22 +39,27 @@ export const uploadImage = async (file, name) => {
 
 }
 
-export const getLogoURL = async (address, height = 300, width = 300) => {
-  const url = `https://res.cloudinary.com/dlqoivlg9/image/upload/c_thumb,h_${height},w_${width}/olympuslaunchpad/logo/${address}.png`;
-  
+export const getLogoURL = async (address) => {
+  const url = `https://res.cloudinary.com/dlqoivlg9/image/upload/olympuslaunchpad/logo/${address}.png`;
   const promise = new Promise((resolve, reject) => {
     const img = new Image();
-    img.src = url;
-    if (img.complete) {
-      resolve(img.src)
-    } else {
-      img.onload = () => {
+    try {
+      img.src = url;
+      if (img.complete) {
         resolve(img.src)
-      };
-      
-      img.onerror = () => {
-        reject('error');
-      };
+      } else {
+        img.onload = () => {
+          resolve(img.src)
+        };
+        
+        img.onerror = () => {
+          reject('error');
+        };
+      }
+    }catch(e) {
+      console.log('Error in getLogoURL:', e);
+      reject('error');
+
     }
   });
 

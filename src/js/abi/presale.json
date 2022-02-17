@@ -127,6 +127,19 @@
   },
   {
     "inputs": [],
+    "name": "decimals",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "emergencyWithdraw",
     "outputs": [],
     "stateMutability": "payable",
@@ -268,11 +281,6 @@
             "internalType": "uint256",
             "name": "createdAt",
             "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "balance",
-            "type": "uint256"
           }
         ],
         "internalType": "struct Presale.PresaleInfo",
@@ -291,6 +299,36 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getUserInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "buyable",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "balance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "claimed",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Presale.UserInfo",
+        "name": "",
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",

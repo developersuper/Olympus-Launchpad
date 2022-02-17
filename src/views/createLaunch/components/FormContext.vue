@@ -165,11 +165,12 @@
         CREATE LAUNCH
       </button>
     </div>
-    <div v-if="!isValidAll" class="text-center text-error-red error-msg">Something went wrong. Check fields and try again!</div>
+    <div v-if="!isValidAll" class="text-center text-error-red error-msg">{{ error }}</div>
   </div>
 </template>
 <script>
 import { mapGetters, mapState, mapActions } from 'vuex';
+import  { utils, BigNumber } from 'ethers';
 
 import {
   detectAddress, 
@@ -177,6 +178,7 @@ import {
   createPresale, 
   getBalanceOfToken,
   approve,
+  getDecimals,
 } from '@/js/web3.js';
 import { uploadImage } from '@/js/service.js';
 
@@ -207,8 +209,6 @@ export default {
     this.model = {
       ...launches_type,
     },
-    this.startDate = Date.now() + 600000;
-    this.endDate = Date.now() + 1000000000;
     this.config = {
       enableTime: true,
       enableSeconds: true,
@@ -216,7 +216,7 @@ export default {
       dateFormat: 'Y-m-d H:i:s',
       time_24hr: true,
     };
-    this.tokenAddress = '0x249B39D42Ff9351568b11f49d9923D1B4155D455'; //dev
+    this.init();
   },
   data() {
     return {
@@ -226,7 +226,6 @@ export default {
       isApproved: false,
       isValidAddress: '',
       isValidAll: true,
-      presaleOwner: null,
       tokenAddress: '',
       isWhitelisted: false,
       whitelistedArray: [],
@@ -241,17 +240,24 @@ export default {
       percentageRaised: 40,
       bnbLimit: 0.1,
       bnbMax: 1.5,
+      error: '',
+      decimals: 18,
     };
   },
   watch: {
     tokenAddress: async function(val) {
       this.loading = true;
-      this.tokenName = await getName(val, this.provider);
-      if (val.length == 42 && await detectAddress(val, this.web3) == "0x" && this.tokenName !== "") {
+      if(val === '') {
+        this.isValidAddress = 'Please insert address of BEP20 token.';
+        return;
+      }
+      this.tokenName = await getName(val);
+      if (val.length == 42 && detectAddress(val) && this.tokenName !== "") {
         this.isValidAddress = 'correct';
-        this.tokenBalance = await getBalanceOfToken(val, this.address, this.provider);
+        this.tokenBalance = await getBalanceOfToken(val, this.address);
         this.availableTokens = this.tokenBalance;
         this.hardCap = this.availableTokens / this.presaleRate;
+        this.decimals = await getDecimals(val);
         this.softCap = this.hardCap / 2 + 1;
       } else {
         this.isValidAddress = 'Invalid token address!  Please try with correct address.';
@@ -268,8 +274,6 @@ export default {
       'loadPresales'
     ]),
     async approve() {
-      await this.loadPresales(this.provider);
-      await uploadImage(this.imageFile, this.launches[this.launches.length - 1].presaleAddr);
       this.loading = true
       if (
         this.isValidAddress === 'correct' && 
@@ -280,7 +284,6 @@ export default {
         this.isValidTime === '' && 
         this.isValidLiquidityPercentage === ''
       ) {
-        
         const result = await approve(this.tokenAddress, this.availableTokens, this.provider);
       
         if(!result) {
@@ -297,48 +300,63 @@ export default {
     },
     async createLaunch() {
       this.loading = true;
+
+        const addrs = [
+          this.tokenAddress,
+          this.address
+        ];
+
+        const uints = [
+          utils.parseEther(this.softCap.toString()),
+          utils.parseEther(this.hardCap.toString()),
+          this.presaleRate,
+          utils.parseEther(this.bnbLimit.toString()),
+          utils.parseEther(this.bnbMax.toString()),
+          this.percentageRaised,
+          Math.ceil((new Date(this.startDate)).getTime() / 1000),
+          Math.ceil((new Date(this.endDate)).getTime() / 1000),
+          BigNumber.from(this.availableTokens.toString()).mul(BigNumber.from('10').pow(this.decimals))
+        ];
+        const bools = [
+          this.isWhitelisted,
+          true
+        ];
+
       const result = await createPresale(
-        this.tokenAddress,
-        this.address,
-        this.softCap,
-        this.hardCap,
-        this.presaleRate,
-        this.bnbLimit,
-        this.bnbMax,
-        this.percentageRaised,
-        this.startDate,
-        this.endDate,
-        this.availableTokens,
-        this.isWhitelisted,
-        true,
+        addrs,
+        uints,
+        bools,
         this.whitelistedArray,
         this.provider
       );
       if(result === true) {
-        console.log('after creating new presale');
-        await this.loadPresales(this.provider);
-        await uploadImage(this.imageFile, this.launches[this.launches.length - 1].presaleAddr);
+        const resultOfUploadLogo = await uploadImage(this.imageFile, this.launches.length.toString());
+        if(!resultOfUploadLogo) {
+          this.error = 'Presale is launched successfuly, but failed in log uploading. Please contact support.';
+          this.isValidAll = false;
+        }
+        await this.loadPresales();
         this.tokenAddress = '';
       }else {
+        this.error ='Somthing went wrong! Try again.';
         this.isValidAll = false;
         this.isApproved = false;
       }
       this.loading = false;
     },
-    setApprovedFlag() {
-      this.isApproved = true;
-    },
     init() {
+      this.isValidAddress = 'Please insert address of BEP20 token.';
+      this.startDate = Date.now() + 600000;
+      this.endDate = Date.now() + 1000000000;
       this.imageFile = null;
       this.isApproved = false;
       this.isValidAll = true;
       this.isWhitelisted = false;
       this.whitelistedArray = [];
-      this.startDate = "2022-01-01";
-      this.endDate = "2022-12-12";
       this.percentageRaised = 40;
       this.bnbLimit = 0.1;
       this.bnbMax = 1.5;
+      this.tokenName= '--';
     },
   },
   computed: {
@@ -346,37 +364,44 @@ export default {
       'address',
       'isWalletConnected',
     ]),
-    ...mapState(['launche_types', 'provider', 'web3']),
+    ...mapState(['launche_types']),
+    ...mapState('wallet', ['provider']),
     ...mapState('launchpad', ['launches']),
     isValidCap() {
+      if(isNaN(this.softCap) || isNaN(this.hardCap)) return 'Not numbers, must be numbers.';
       if(this.softCap === 0 || this.hardCap === 0) return 'Softcap and Hardcap must not be 0.';
       if(this.softCap > this.hardCap) return 'Softcap must not exceed Hardcap.';
       if(this.softCap * 2 <= this.hardCap) return 'Hardcap must be smaller than 2 times of softCap.';
       return '';
     },
     isValidAvailablePresale() {
+      if(isNaN(this.availableTokens)) return 'Not number, must be number.'
       if(this.availableTokens <= 0) return 'Must be over 0.';
       if(this.availableTokens > this.tokenBalance) return 'Must be smaller than balance.';
       return '';
     },
     isValidPresaleRate() {
+      if(isNaN(this.presaleRate)) return 'Not number, must be number.'
       if(this.presaleRate <= 0) return 'Presale rate must be bigger than 0.';
       if(this.availableTokens / this.presaleRate < this.softCap) return 'Current presale rate couldn\'t reach softcap.';
       return '';
     },
     isValidBNBPerUser() {
+      if(isNaN(this.bnbLimit) || isNaN(this.bnbMax)) return 'Not numbers, must be numbers.'
       if(this.bnbLimit < 0 || this.bnbMax < 0) return 'Should be over 0.';
       if(this.bnbLimit > this.bnbMax) return 'BNB Min must be smaller than BNB Max.';
       return '';
     },
     isValidTime() {
-      const start = new Date(this.startDate);
-      const end = new Date(this.endDate);
-      if(start.getTime() < Date.now()) return 'Start time passed current time.';
-      if(start.getTime() > end.getTime()) return 'Start time must before end time.';
+      const start = (new Date(this.startDate)).getTime();
+      const end = (new Date(this.endDate)).getTime();
+      if(isNaN(start) || isNaN(end)) return 'Incorrect date.';
+      if(start < Date.now()) return 'Start time passed current time.';
+      if(start > end) return 'Start time must before end time.';
       return '';
     },
     isValidLiquidityPercentage() {
+      if(isNaN(this.percentageRaised)) return 'Not number, must be number.';
       if(this.percentageRaised < 40) return 'must be over 40%';
       return '';
     }

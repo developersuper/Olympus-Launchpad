@@ -55,6 +55,7 @@ export default {
       return Math.floor(this.leftTime % (60));
     },
     progress() {
+      if(this.nowTime < this.startTime) return 0;
       return ((1.0 * (this.nowTime - this.startTime) / (this.endTime - this.startTime)) * 100).toFixed(2);
     },
   }

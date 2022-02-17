@@ -15,20 +15,20 @@ import "flatpickr/dist/flatpickr.css";
 import VWave from "v-wave";
 
 
-window.addEventListener("load", function() {
-  console.log('loading...');
-  if(window.ethereum) {
-    window.ethereum.on('accountsChanged', function (accounts) {
-      console.log('accountsChanges',accounts);
+// window.addEventListener("load", function() {
+//   console.log('loading...');
+//   if(window.ethereum) {
+//     window.ethereum.on('accountsChanged', function (accounts) {
+//       console.log('accountsChanges',accounts);
       
-    });
-    // detect Network account change
-    window.ethereum.on('networkChanged', function(networkId){
-      console.log('networkChanged', networkId);
-      store.dispatch('initialize');
-    });
-  }
-});
+//     });
+//     // detect Network account change
+//     window.ethereum.on('networkChanged', function(networkId){
+//       console.log('networkChanged', networkId);
+//       store.dispatch('initialize');
+//     });
+//   }
+// });
 
 createApp(App)
   .use(router)
