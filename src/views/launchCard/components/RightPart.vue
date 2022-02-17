@@ -102,7 +102,7 @@
           class="gradient-color lg-btn p-4 text-gray-100 rounded-lg w-full font-semibold hover:bg-opacity-80 transition-all duration-200"
           @click="$store.dispatch('wallet/connectWallet')"
         >
-          PARTICIPATE
+          CONNECT WALLET
         </button>
       </div>
 
